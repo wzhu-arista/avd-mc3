@@ -1,0 +1,13 @@
+vlan 11
+!
+interface Ethernet1
+   channel-group 1 mode active
+!
+interface Ethernet2
+   channel-group 1 mode active
+!
+interface Port-Channel1
+   switchport mode trunk
+!
+interface Vlan11
+   ip address 10.10.11.11/24

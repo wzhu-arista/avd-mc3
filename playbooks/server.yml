@@ -1,0 +1,9 @@
+---
+- hosts: Servers
+  gather_facts: no
+  tasks:
+  - name: push config
+    arista.eos.eos_config:
+      src: "{{lookup('env','PWD')}}/playbooks/templates/{{ inventory_hostname }}.j2"
+      save_when: always
+

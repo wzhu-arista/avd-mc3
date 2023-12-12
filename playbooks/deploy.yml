@@ -1,0 +1,59 @@
+---
+# deploy.yml
+
+- name: Build and Deploy Configs
+  hosts: FABRIC
+  gather_facts: false
+  tasks:
+
+    - name: Generate AVD Structured Configurations and Fabric Documentation
+      ansible.builtin.import_role:
+        name: arista.avd.eos_designs
+
+    - name: Generate Device Configurations and Documentation
+      ansible.builtin.import_role:
+        name: arista.avd.eos_cli_config_gen
+
+    # - name: Deploy Configurations to Devices
+    #   ansible.builtin.import_role:
+    #     name: arista.avd.eos_config_deploy_eapi
+
+    - name: Copy config to device
+      ansible.netcommon.net_put:
+        src: "{{ lookup('env', 'PWD') }}/intended/configs/{{ inventory_hostname }}.cfg"
+        dest: "intended-config.cfg"
+        protocol: sftp
+      vars:
+        # ansible_host: "mgmt-{{ inventory_hostname }}.{{ interdotlink['domain_name'] }}"
+        ansible_connection: network_cli
+        ansible_network_os: arista.eos.eos
+
+    - name: Generate a random config session ID
+      ansible.builtin.set_fact:
+        session_id: "{{ 4294967295 | random(start=65535) }}"
+
+    - name: Start a config session
+      arista.eos.eos_command:
+        commands:
+          - configure session {{ session_id }}
+          - rollback clean-config
+          - copy file:/home/{{ ansible_user }}/intended-config.cfg session-config
+
+    # - name: Commit the replacement config with a timer
+    #   arista.eos.eos_command:
+    #     commands:
+    #       - configure checkpoint save
+    #       - >
+    #         configure session {{ session_id }} commit timer
+    #         {{ eos_config_interactive_timer if 'interactive' in ansible_run_tags else eos_config_non_interactive_timer }}
+    #   register: commit_output
+
+
+    - name: Commit the changes
+      arista.eos.eos_command:
+        commands:
+          - configure session {{ session_id }} commit
+
+    - name: Save changes to startup config
+      arista.eos.eos_command:
+        commands: copy running-config startup-config

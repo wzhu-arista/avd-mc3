@@ -1,0 +1,50 @@
+{% if 'leaf2a' in hostname or 'leaf2b' in hostname %}
+router bgp {{ router_bgp.as }}
+   address-family evpn
+{% for peergroup in router_bgp.address_family_evpn.peer_groups %}   
+      neighbor {{ peergroup.name }} rcf in matchComm()
+      neighbor {{ peergroup.name }} rcf out addComm()
+{% endfor %}
+      layer-2 fec in-place update
+      !
+{% if 'dc1' in hostname %}
+      evpn ethernet-segment domain all
+         identifier 0011:1111:1111:1111:1111
+         route-target import 00:01:00:01:00:01
+      !
+router general
+   control-functions
+      code
+            function addComm() {
+               if evpn.route_type is EVPN_IMET or evpn.route_type is EVPN_MAC_IP {
+                  community add {1:1};
+            }
+               return true;
+            }
+            function matchComm() {
+               return community has_none {1:1};
+            }
+      EOF
+!
+{% endif %}
+{% if 'dc2' in hostname %}
+      evpn ethernet-segment domain all
+         identifier 0022:2222:2222:2222:2222
+         route-target import 00:02:00:01:00:01
+      !
+router general
+   control-functions
+      code
+            function addComm() {
+               if evpn.route_type is EVPN_IMET or evpn.route_type is EVPN_MAC_IP {
+                  community add {2:2};
+            }
+               return true;
+            }
+            function matchComm() {
+               return community has_none {2:2};
+            }
+      EOF
+!
+{% endif %}      
+{% endif %}

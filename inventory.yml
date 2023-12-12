@@ -1,0 +1,88 @@
+---
+# inventory.yml
+all:
+  vars:
+    ansible_connection: httpapi
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_user: admin
+    ansible_password: admin
+    ansible_become: true
+    ansible_become_method: enable
+    ansible_network_os: eos
+    ansible_httpapi_port: 443
+    ansible_python_interpreter: $(which python3)
+  children:
+    Servers:
+      hosts:
+        dc1-server1:
+          ansible_host: 192.168.124.104
+        dc1-server2:
+          ansible_host: 192.168.124.108
+        dc2-server1:
+          ansible_host: 192.168.124.114
+        dc2-server2:
+          ansible_host: 192.168.124.118
+    FABRIC:
+      children:
+        DC1:
+          children:
+            DC1_SPINES:
+              hosts:
+                dc1-spine1:
+                  ansible_host: 192.168.124.101
+                dc1-spine2:
+                  ansible_host: 192.168.124.102
+            DC1_L3_LEAVES:
+              hosts:
+                dc1-leaf1:
+                  ansible_host: 192.168.124.103
+                dc1-leaf2a:
+                  ansible_host: 192.168.124.105
+                dc1-leaf2b:
+                  ansible_host: 192.168.124.106
+                dc1-bl1:
+                  ansible_host: 192.168.124.109
+                dc1-bl2:
+                  ansible_host: 192.168.124.110
+            DC1_L2_LEAVES:
+              hosts:
+                dc1-leaf1c:
+                  ansible_host: 192.168.124.107
+        DC2:
+          children:
+            DC2_SPINES:
+              hosts:
+                dc2-spine1:
+                  ansible_host: 192.168.124.111
+                dc2-spine2:
+                  ansible_host: 192.168.124.112
+            DC2_L3_LEAVES:
+              hosts:
+                dc2-leaf1:
+                  ansible_host: 192.168.124.113
+                dc2-leaf2a:
+                  ansible_host: 192.168.124.115
+                dc2-leaf2b:
+                  ansible_host: 192.168.124.116
+                dc2-bl1:
+                  ansible_host: 192.168.124.119
+                dc2-bl2:
+                  ansible_host: 192.168.124.120                  
+            DC2_L2_LEAVES:
+              hosts:
+                dc2-leaf1c:
+                  ansible_host: 192.168.124.117
+
+    NETWORK_SERVICES:
+      children:
+        DC1_L3_LEAVES:
+        DC1_L2_LEAVES:
+        DC2_L3_LEAVES:
+        DC2_L2_LEAVES:
+    CONNECTED_ENDPOINTS:
+      children:
+        DC1_L3_LEAVES:
+        DC1_L2_LEAVES:
+        DC2_L3_LEAVES:
+        DC2_L2_LEAVES:
