@@ -60,6 +60,9 @@ l3leaf:
     # Definition of a node group that will include two devices in MLAG.
     # Definitions under the group will be inherited by both nodes in the group
     - group: DC2_L3_LEAF1
+      filter:
+        tenants: [all]
+        tags: [all]
       # ASN to be used by BGP for the group. Both devices in the MLAG pair will use the same BGP ASN
       # bgp_as: 65201
       mlag: false
@@ -75,6 +78,9 @@ l3leaf:
             - Ethernet1
             - Ethernet1
     - group: DC2_L3_LEAF2
+      filter:
+        tenants: [all]
+        tags: [all]
       bgp_as: 65202
       nodes: 
         - name: dc2-leaf2a
@@ -90,6 +96,9 @@ l3leaf:
             - Ethernet3
             - Ethernet3
     - group: DC2_L3_BL
+      filter:
+        tenants: [all]
+        tags: [none]
       # bgp_as: 65203
       mlag: false
       # evpn_gateway:

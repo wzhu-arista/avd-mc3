@@ -20,17 +20,17 @@
 | FABRIC | l3leaf | dc1-bl1 | 192.168.124.109/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc1-bl2 | 192.168.124.110/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc1-leaf1 | 192.168.124.103/24 | vEOS-lab | Provisioned | - |
-| FABRIC | l2leaf | dc1-leaf1c | - | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc1-leaf2a | 192.168.124.105/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc1-leaf2b | 192.168.124.106/24 | vEOS-lab | Provisioned | - |
+| FABRIC | l2leaf | dc1-leaf2c | 192.168.124.107/24 | vEOS-lab | Provisioned | - |
 | FABRIC | spine | dc1-spine1 | 192.168.124.101/24 | vEOS-lab | Provisioned | - |
 | FABRIC | spine | dc1-spine2 | 192.168.124.102/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc2-bl1 | 192.168.124.119/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc2-bl2 | 192.168.124.120/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc2-leaf1 | 192.168.124.113/24 | vEOS-lab | Provisioned | - |
-| FABRIC | l2leaf | dc2-leaf1c | - | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc2-leaf2a | 192.168.124.115/24 | vEOS-lab | Provisioned | - |
 | FABRIC | l3leaf | dc2-leaf2b | 192.168.124.116/24 | vEOS-lab | Provisioned | - |
+| FABRIC | l2leaf | dc2-leaf2c | 192.168.124.107/24 | vEOS-lab | Provisioned | - |
 | FABRIC | spine | dc2-spine1 | 192.168.124.111/24 | vEOS-lab | Provisioned | - |
 | FABRIC | spine | dc2-spine2 | 192.168.124.112/24 | vEOS-lab | Provisioned | - |
 
@@ -56,8 +56,10 @@
 | l3leaf | dc1-leaf2a | Ethernet1 | spine | dc1-spine1 | Ethernet2 |
 | l3leaf | dc1-leaf2a | Ethernet2 | spine | dc1-spine2 | Ethernet2 |
 | l3leaf | dc1-leaf2a | Ethernet3 | mlag_peer | dc1-leaf2b | Ethernet3 |
+| l3leaf | dc1-leaf2a | Ethernet4 | l2leaf | dc1-leaf2c | Ethernet1 |
 | l3leaf | dc1-leaf2b | Ethernet1 | spine | dc1-spine1 | Ethernet3 |
 | l3leaf | dc1-leaf2b | Ethernet2 | spine | dc1-spine2 | Ethernet3 |
+| l3leaf | dc1-leaf2b | Ethernet4 | l2leaf | dc1-leaf2c | Ethernet2 |
 | l3leaf | dc2-bl1 | Ethernet1 | spine | dc2-spine1 | Ethernet4 |
 | l3leaf | dc2-bl1 | Ethernet2 | spine | dc2-spine2 | Ethernet4 |
 | l3leaf | dc2-bl2 | Ethernet1 | spine | dc2-spine1 | Ethernet5 |
@@ -67,8 +69,10 @@
 | l3leaf | dc2-leaf2a | Ethernet1 | spine | dc2-spine1 | Ethernet2 |
 | l3leaf | dc2-leaf2a | Ethernet2 | spine | dc2-spine2 | Ethernet2 |
 | l3leaf | dc2-leaf2a | Ethernet3 | mlag_peer | dc2-leaf2b | Ethernet3 |
+| l3leaf | dc2-leaf2a | Ethernet4 | l2leaf | dc2-leaf2c | Ethernet1 |
 | l3leaf | dc2-leaf2b | Ethernet1 | spine | dc2-spine1 | Ethernet3 |
 | l3leaf | dc2-leaf2b | Ethernet2 | spine | dc2-spine2 | Ethernet3 |
+| l3leaf | dc2-leaf2b | Ethernet4 | l2leaf | dc2-leaf2c | Ethernet2 |
 
 ## Fabric IP Allocation
 

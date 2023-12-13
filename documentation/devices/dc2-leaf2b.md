@@ -37,6 +37,8 @@
   - [Router BFD](#router-bfd)
 - [Multicast](#multicast)
   - [IP IGMP Snooping](#ip-igmp-snooping)
+  - [Router Multicast](#router-multicast)
+  - [PIM Sparse Mode](#pim-sparse-mode)
 - [Filters](#filters)
   - [Prefix-lists](#prefix-lists)
   - [Route-maps](#route-maps)
@@ -213,8 +215,6 @@ vlan internal order ascending range 1006 1199
 | 22 | VRF11_VLAN22 | - |
 | 3009 | MLAG_iBGP_VRF10 | LEAF_PEER_L3 |
 | 3010 | MLAG_iBGP_VRF11 | LEAF_PEER_L3 |
-| 3401 | L2_VLAN3401 | - |
-| 3402 | L2_VLAN3402 | - |
 | 4093 | LEAF_PEER_L3 | LEAF_PEER_L3 |
 | 4094 | MLAG_PEER | MLAG |
 
@@ -242,12 +242,6 @@ vlan 3010
    name MLAG_iBGP_VRF11
    trunk group LEAF_PEER_L3
 !
-vlan 3401
-   name L2_VLAN3401
-!
-vlan 3402
-   name L2_VLAN3402
-!
 vlan 4093
    name LEAF_PEER_L3
    trunk group LEAF_PEER_L3
@@ -268,6 +262,7 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet3 | MLAG_PEER_dc2-leaf2a_Ethernet3 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 3 |
+| Ethernet4 | DC2-LEAF2C_Ethernet2 | *trunk | *11-12,21-22 | *- | *- | 4 |
 | Ethernet5 | dc2-server2_eth2 | *trunk | *11-12,21-22 | *4092 | *- | 5 |
 
 *Inherited from Port-Channel Interface
@@ -289,6 +284,7 @@ interface Ethernet1
    mtu 1500
    no switchport
    ip address 10.255.2.41/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet2
    description P2P_LINK_TO_DC2-SPINE2_Ethernet3
@@ -296,11 +292,17 @@ interface Ethernet2
    mtu 1500
    no switchport
    ip address 10.255.2.43/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet3
    description MLAG_PEER_dc2-leaf2a_Ethernet3
    no shutdown
    channel-group 3 mode active
+!
+interface Ethernet4
+   description DC2-LEAF2C_Ethernet2
+   no shutdown
+   channel-group 4 mode active
 !
 interface Ethernet5
    description dc2-server2_eth2
@@ -317,6 +319,7 @@ interface Ethernet5
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel3 | MLAG_PEER_dc2-leaf2a_Po3 | switched | trunk | - | - | ['LEAF_PEER_L3', 'MLAG'] | - | - | - | - |
+| Port-Channel4 | DC2-LEAF2C_Po1 | switched | trunk | 11-12,21-22 | - | - | - | - | 4 | - |
 | Port-Channel5 | dc2-server2_PortChannel dc2-server2 | switched | trunk | 11-12,21-22 | 4092 | - | - | - | 5 | - |
 
 #### Port-Channel Interfaces Device Configuration
@@ -330,6 +333,14 @@ interface Port-Channel3
    switchport mode trunk
    switchport trunk group LEAF_PEER_L3
    switchport trunk group MLAG
+!
+interface Port-Channel4
+   description DC2-LEAF2C_Po1
+   no shutdown
+   switchport
+   switchport trunk allowed vlan 11-12,21-22
+   switchport mode trunk
+   mlag 4
 !
 interface Port-Channel5
    description dc2-server2_PortChannel dc2-server2
@@ -428,24 +439,32 @@ interface Vlan11
    description VRF10_VLAN11
    no shutdown
    vrf VRF10
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback10
    ip address virtual 10.10.11.1/24
 !
 interface Vlan12
    description VRF10_VLAN12
    no shutdown
    vrf VRF10
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback10
    ip address virtual 10.10.12.1/24
 !
 interface Vlan21
    description VRF11_VLAN21
    no shutdown
    vrf VRF11
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback11
    ip address virtual 10.10.21.1/24
 !
 interface Vlan22
    description VRF11_VLAN22
    no shutdown
    vrf VRF11
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback11
    ip address virtual 10.10.22.1/24
 !
 interface Vlan3009
@@ -467,6 +486,7 @@ interface Vlan4093
    no shutdown
    mtu 1500
    ip address 10.255.2.99/31
+   pim ipv4 sparse-mode
 !
 interface Vlan4094
    description MLAG_PEER
@@ -482,7 +502,8 @@ interface Vlan4094
 
 | Setting | Value |
 | ------- | ----- |
-| Source Interface | Loopback1 |
+| Source Interface | Loopback0 |
+| MLAG Source Interface | Loopback1 |
 | UDP port | 4789 |
 | EVPN MLAG Shared Router MAC | mlag-system-id |
 
@@ -490,19 +511,17 @@ interface Vlan4094
 
 | VLAN | VNI | Flood List | Multicast Group |
 | ---- | --- | ---------- | --------------- |
-| 11 | 10011 | - | - |
-| 12 | 10012 | - | - |
-| 21 | 10021 | - | - |
-| 22 | 10022 | - | - |
-| 3401 | 13401 | - | - |
-| 3402 | 13402 | - | - |
+| 11 | 10011 | - | 225.1.1.11 |
+| 12 | 10012 | - | 225.1.1.12 |
+| 21 | 10021 | - | 225.1.1.21 |
+| 22 | 10022 | - | 225.1.1.22 |
 
 ##### VRF to VNI and Multicast Group Mappings
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| VRF10 | 10 | - |
-| VRF11 | 11 | - |
+| VRF10 | 10 | 225.2.1.10 |
+| VRF11 | 11 | 225.2.1.11 |
 
 #### VXLAN Interface Device Configuration
 
@@ -510,17 +529,22 @@ interface Vlan4094
 !
 interface Vxlan1
    description dc2-leaf2b_VTEP
-   vxlan source-interface Loopback1
+   vxlan source-interface Loopback0
    vxlan virtual-router encapsulation mac-address mlag-system-id
    vxlan udp-port 4789
    vxlan vlan 11 vni 10011
    vxlan vlan 12 vni 10012
    vxlan vlan 21 vni 10021
    vxlan vlan 22 vni 10022
-   vxlan vlan 3401 vni 13401
-   vxlan vlan 3402 vni 13402
    vxlan vrf VRF10 vni 10
    vxlan vrf VRF11 vni 11
+   vxlan mlag source-interface Loopback1
+   vxlan vlan 11 multicast group 225.1.1.11
+   vxlan vlan 12 multicast group 225.1.1.12
+   vxlan vlan 21 multicast group 225.1.1.21
+   vxlan vlan 22 multicast group 225.1.1.22
+   vxlan vrf VRF10 multicast group 225.2.1.10
+   vxlan vrf VRF11 multicast group 225.2.1.11
 ```
 
 ## Routing
@@ -658,23 +682,19 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | ---------- | -------- | ------------- |
 | EVPN-OVERLAY-PEERS | True | default |
 
-#### Router BGP VLANs
+#### Router BGP VLAN Aware Bundles
 
-| VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
-| ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
-| 11 | 10.255.2.5:10011 | 10011:10011 | - | - | learned |
-| 12 | 10.255.2.5:10012 | 10012:10012 | - | - | learned |
-| 21 | 10.255.2.5:10021 | 10021:10021 | - | - | learned |
-| 22 | 10.255.2.5:10022 | 10022:10022 | - | - | learned |
-| 3401 | 10.255.2.5:13401 | 13401:13401 | - | - | learned |
-| 3402 | 10.255.2.5:13402 | 13402:13402 | - | - | learned |
+| VLAN Aware Bundle | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute | VLANs |
+| ----------------- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ | ----- |
+| VRF10 | 10.255.2.5:20010 | 20010:20010 | - | - | learned<br>igmp | 11-12 |
+| VRF11 | 10.255.2.5:20011 | 20011:20011 | - | - | learned<br>igmp | 21-22 |
 
 #### Router BGP VRFs
 
-| VRF | Route-Distinguisher | Redistribute |
-| --- | ------------------- | ------------ |
-| VRF10 | 10.255.2.5:10 | connected |
-| VRF11 | 10.255.2.5:11 | connected |
+| VRF | Route-Distinguisher | Redistribute | EVPN Multicast |
+| --- | ------------------- | ------------ | -------------- |
+| VRF10 | 10.255.2.5:10 | connected | IPv4: True<br>Transit: False |
+| VRF11 | 10.255.2.5:11 | connected | IPv4: True<br>Transit: False |
 
 #### Router BGP Device Configuration
 
@@ -719,35 +739,19 @@ router bgp 65202
    neighbor 10.255.2.98 description dc2-leaf2a
    redistribute connected route-map RM-CONN-2-BGP
    !
-   vlan 11
-      rd 10.255.2.5:10011
-      route-target both 10011:10011
+   vlan-aware-bundle VRF10
+      rd 10.255.2.5:20010
+      route-target both 20010:20010
+      redistribute igmp
       redistribute learned
+      vlan 11-12
    !
-   vlan 12
-      rd 10.255.2.5:10012
-      route-target both 10012:10012
+   vlan-aware-bundle VRF11
+      rd 10.255.2.5:20011
+      route-target both 20011:20011
+      redistribute igmp
       redistribute learned
-   !
-   vlan 21
-      rd 10.255.2.5:10021
-      route-target both 10021:10021
-      redistribute learned
-   !
-   vlan 22
-      rd 10.255.2.5:10022
-      route-target both 10022:10022
-      redistribute learned
-   !
-   vlan 3401
-      rd 10.255.2.5:13401
-      route-target both 13401:13401
-      redistribute learned
-   !
-   vlan 3402
-      rd 10.255.2.5:13402
-      route-target both 13402:13402
-      redistribute learned
+      vlan 21-22
    !
    address-family evpn
       neighbor EVPN-OVERLAY-PEERS activate
@@ -759,6 +763,7 @@ router bgp 65202
    !
    vrf VRF10
       rd 10.255.2.5:10
+      evpn multicast
       route-target import evpn 10:10
       route-target export evpn 10:10
       router-id 10.255.2.5
@@ -767,6 +772,7 @@ router bgp 65202
    !
    vrf VRF11
       rd 10.255.2.5:11
+      evpn multicast
       route-target import evpn 11:11
       route-target export evpn 11:11
       router-id 10.255.2.5
@@ -802,10 +808,82 @@ router bfd
 | ------------- | ---------- | ----------------------- | ----- | ---------------------- | ------------------- |
 | Enabled | - | - | - | - | - |
 
+##### IP IGMP Snooping Vlan Summary
+
+| Vlan | IGMP Snooping | Fast Leave | Max Groups | Proxy |
+| ---- | ------------- | ---------- | ---------- | ----- |
+| 11 | - | - | - | - |
+| 12 | - | - | - | - |
+| 21 | - | - | - | - |
+| 22 | - | - | - | - |
+
+| Vlan | Querier Enabled | IP Address | Query Interval | Max Response Time | Last Member Query Interval | Last Member Query Count | Startup Query Interval | Startup Query Count | Version |
+| ---- | --------------- | ---------- | -------------- | ----------------- | -------------------------- | ----------------------- | ---------------------- | ------------------- | ------- |
+| 11 | True | 10.255.2.5 | - | - | - | - | - | - | - |
+| 12 | True | 10.255.2.5 | - | - | - | - | - | - | - |
+| 21 | True | 10.255.2.5 | - | - | - | - | - | - | - |
+| 22 | True | 10.255.2.5 | - | - | - | - | - | - | - |
+
 #### IP IGMP Snooping Device Configuration
 
 ```eos
+!
+ip igmp snooping vlan 11 querier
+ip igmp snooping vlan 11 querier address 10.255.2.5
+ip igmp snooping vlan 12 querier
+ip igmp snooping vlan 12 querier address 10.255.2.5
+ip igmp snooping vlan 21 querier
+ip igmp snooping vlan 21 querier address 10.255.2.5
+ip igmp snooping vlan 22 querier
+ip igmp snooping vlan 22 querier address 10.255.2.5
 ```
+
+### Router Multicast
+
+#### IP Router Multicast Summary
+
+- Routing for IPv4 multicast is enabled.
+- Software forwarding by the Software Forwarding Engine (SFE)
+
+#### IP Router Multicast VRFs
+
+| VRF Name | Multicast Routing |
+| -------- | ----------------- |
+| VRF10 | enabled |
+| VRF11 | enabled |
+
+#### Router Multicast Device Configuration
+
+```eos
+!
+router multicast
+   ipv4
+      routing
+      software-forwarding sfe
+   !
+   vrf VRF10
+      ipv4
+         routing
+   !
+   vrf VRF11
+      ipv4
+         routing
+```
+
+
+### PIM Sparse Mode
+
+#### PIM Sparse Mode enabled interfaces
+
+| Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
+| -------------- | -------- | ---------- | ----------- | --------------- |
+| Ethernet1 | - | IPv4 | - | - |
+| Ethernet2 | - | IPv4 | - | - |
+| Vlan11 | VRF10 | IPv4 | - | Loopback10 |
+| Vlan12 | VRF10 | IPv4 | - | Loopback10 |
+| Vlan21 | VRF11 | IPv4 | - | Loopback11 |
+| Vlan22 | VRF11 | IPv4 | - | Loopback11 |
+| Vlan4093 | - | IPv4 | - | - |
 
 ## Filters
 

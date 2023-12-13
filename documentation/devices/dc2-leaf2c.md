@@ -1,8 +1,9 @@
-# dc2-leaf1c
+# dc2-leaf2c
 
 ## Table of Contents
 
 - [Management](#management)
+  - [Management Interfaces](#management-interfaces)
   - [Management API HTTP](#management-api-http)
 - [Authentication](#authentication)
   - [Local Users](#local-users)
@@ -16,6 +17,9 @@
 - [VLANs](#vlans)
   - [VLANs Summary](#vlans-summary)
   - [VLANs Device Configuration](#vlans-device-configuration)
+- [Interfaces](#interfaces)
+  - [Ethernet Interfaces](#ethernet-interfaces)
+  - [Port-Channel Interfaces](#port-channel-interfaces)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
   - [IP Routing](#ip-routing)
@@ -28,6 +32,33 @@
   - [VRF Instances Device Configuration](#vrf-instances-device-configuration)
 
 ## Management
+
+### Management Interfaces
+
+#### Management Interfaces Summary
+
+##### IPv4
+
+| Management Interface | description | Type | VRF | IP Address | Gateway |
+| -------------------- | ----------- | ---- | --- | ---------- | ------- |
+| Management0 | oob_management | oob | MGMT | 192.168.124.107/24 | 192.168.124.1 |
+
+##### IPv6
+
+| Management Interface | description | Type | VRF | IPv6 Address | IPv6 Gateway |
+| -------------------- | ----------- | ---- | --- | ------------ | ------------ |
+| Management0 | oob_management | oob | MGMT | - | - |
+
+#### Management Interfaces Device Configuration
+
+```eos
+!
+interface Management0
+   description oob_management
+   no shutdown
+   vrf MGMT
+   ip address 192.168.124.107/24
+```
 
 ### Management API HTTP
 
@@ -152,6 +183,67 @@ vlan 21
 !
 vlan 22
    name VRF11_VLAN22
+```
+
+## Interfaces
+
+### Ethernet Interfaces
+
+#### Ethernet Interfaces Summary
+
+##### L2
+
+| Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
+| --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
+| Ethernet1 | DC2-LEAF2A_Ethernet4 | *trunk | *11-12,21-22 | *- | *- | 1 |
+| Ethernet2 | DC2-LEAF2B_Ethernet4 | *trunk | *11-12,21-22 | *- | *- | 1 |
+| Ethernet3 |  dc2-server2_eth3 | access | 11 | - | - | - |
+
+*Inherited from Port-Channel Interface
+
+#### Ethernet Interfaces Device Configuration
+
+```eos
+!
+interface Ethernet1
+   description DC2-LEAF2A_Ethernet4
+   no shutdown
+   channel-group 1 mode active
+!
+interface Ethernet2
+   description DC2-LEAF2B_Ethernet4
+   no shutdown
+   channel-group 1 mode active
+!
+interface Ethernet3
+   description dc2-server2_eth3
+   no shutdown
+   switchport access vlan 11
+   switchport mode access
+   switchport
+   spanning-tree portfast
+```
+
+### Port-Channel Interfaces
+
+#### Port-Channel Interfaces Summary
+
+##### L2
+
+| Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
+| --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
+| Port-Channel1 | DC2_L3_LEAF2_Po4 | switched | trunk | 11-12,21-22 | - | - | - | - | - | - |
+
+#### Port-Channel Interfaces Device Configuration
+
+```eos
+!
+interface Port-Channel1
+   description DC2_L3_LEAF2_Po4
+   no shutdown
+   switchport
+   switchport trunk allowed vlan 11-12,21-22
+   switchport mode trunk
 ```
 
 ## Routing

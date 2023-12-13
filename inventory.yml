@@ -47,7 +47,7 @@ all:
                   ansible_host: 192.168.124.110
             DC1_L2_LEAVES:
               hosts:
-                dc1-leaf1c:
+                dc1-leaf2c:
                   ansible_host: 192.168.124.107
         DC2:
           children:
@@ -71,7 +71,7 @@ all:
                   ansible_host: 192.168.124.120                  
             DC2_L2_LEAVES:
               hosts:
-                dc2-leaf1c:
+                dc2-leaf2c:
                   ansible_host: 192.168.124.117
 
     NETWORK_SERVICES:

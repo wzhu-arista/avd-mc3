@@ -87,6 +87,7 @@ router_bgp:
         - '10:10'
     redistribute_routes:
     - source_protocol: connected
+    evpn_multicast: true
     neighbors:
     - ip_address: 10.255.1.99
       peer_group: MLAG-IPv4-UNDERLAY-PEER
@@ -104,64 +105,46 @@ router_bgp:
         - '11:11'
     redistribute_routes:
     - source_protocol: connected
+    evpn_multicast: true
     neighbors:
     - ip_address: 10.255.1.99
       peer_group: MLAG-IPv4-UNDERLAY-PEER
-  vlans:
-  - id: 11
-    tenant: TENANT1
-    rd: 10.255.1.4:10011
+  vlan_aware_bundles:
+  - name: VRF10
+    rd: 10.255.1.4:20010
     route_targets:
       both:
-      - 10011:10011
+      - 20010:20010
     redistribute_routes:
     - learned
-  - id: 12
-    tenant: TENANT1
-    rd: 10.255.1.4:10012
+    - igmp
+    vlan: 11-12
+  - name: VRF11
+    rd: 10.255.1.4:20011
     route_targets:
       both:
-      - 10012:10012
+      - 20011:20011
     redistribute_routes:
     - learned
-  - id: 21
-    tenant: TENANT1
-    rd: 10.255.1.4:10021
-    route_targets:
-      both:
-      - 10021:10021
-    redistribute_routes:
-    - learned
-  - id: 22
-    tenant: TENANT1
-    rd: 10.255.1.4:10022
-    route_targets:
-      both:
-      - 10022:10022
-    redistribute_routes:
-    - learned
-  - id: 3401
-    tenant: TENANT1
-    rd: 10.255.1.4:13401
-    route_targets:
-      both:
-      - 13401:13401
-    redistribute_routes:
-    - learned
-  - id: 3402
-    tenant: TENANT1
-    rd: 10.255.1.4:13402
-    route_targets:
-      both:
-      - 13402:13402
-    redistribute_routes:
-    - learned
+    - igmp
+    vlan: 21-22
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
   gateway: 192.168.124.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
+router_multicast:
+  ipv4:
+    routing: true
+    software_forwarding: sfe
+  vrfs:
+  - name: VRF10
+    ipv4:
+      routing: true
+  - name: VRF11
+    ipv4:
+      routing: true
 vlan_internal_order:
   allocation: ascending
   range:
@@ -236,18 +219,15 @@ vlans:
   trunk_groups:
   - LEAF_PEER_L3
   tenant: TENANT1
-- id: 3401
-  name: L2_VLAN3401
-  tenant: TENANT1
-- id: 3402
-  name: L2_VLAN3402
-  tenant: TENANT1
 vlan_interfaces:
 - name: Vlan4093
   description: MLAG_PEER_L3_PEERING
   shutdown: false
   mtu: 1500
   ip_address: 10.255.1.98/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Vlan4094
   description: MLAG_PEER
   shutdown: false
@@ -256,15 +236,27 @@ vlan_interfaces:
   mtu: 1500
 - name: Vlan11
   tenant: TENANT1
+  tags:
+  - VRF10_VLANS
   description: VRF10_VLAN11
   shutdown: false
   ip_address_virtual: 10.10.11.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback10
   vrf: VRF10
 - name: Vlan12
   tenant: TENANT1
+  tags:
+  - VRF10_VLANS
   description: VRF10_VLAN12
   shutdown: false
   ip_address_virtual: 10.10.12.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback10
   vrf: VRF10
 - name: Vlan3009
   tenant: TENANT1
@@ -276,15 +268,27 @@ vlan_interfaces:
   ip_address: 10.255.1.98/31
 - name: Vlan21
   tenant: TENANT1
+  tags:
+  - VRF11_VLANS
   description: VRF11_VLAN21
   shutdown: false
   ip_address_virtual: 10.10.21.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback11
   vrf: VRF11
 - name: Vlan22
   tenant: TENANT1
+  tags:
+  - VRF11_VLANS
   description: VRF11_VLAN22
   shutdown: false
   ip_address_virtual: 10.10.22.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback11
   vrf: VRF11
 - name: Vlan3010
   tenant: TENANT1
@@ -303,6 +307,13 @@ port_channel_interfaces:
   trunk_groups:
   - LEAF_PEER_L3
   - MLAG
+- name: Port-Channel4
+  description: DC1-LEAF2C_Po1
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: 11-12,21-22
+  mlag: 4
 - name: Port-Channel5
   description: dc1-server2_PortChannel dc1-server2
   type: switched
@@ -332,6 +343,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.37/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet2
   peer: dc1-spine2
   peer_interface: Ethernet2
@@ -341,6 +355,19 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.39/31
+  pim:
+    ipv4:
+      sparse_mode: true
+- name: Ethernet4
+  peer: dc1-leaf2c
+  peer_interface: Ethernet1
+  peer_type: l2leaf
+  description: DC1-LEAF2C_Ethernet1
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 4
+    mode: active
 - name: Ethernet5
   peer: dc1-server2
   peer_interface: eth1
@@ -405,32 +432,52 @@ router_bfd:
     multiplier: 3
 ip_igmp_snooping:
   globally_enabled: true
+  vlans:
+  - id: 11
+    querier:
+      enabled: true
+      address: 10.255.1.4
+  - id: 12
+    querier:
+      enabled: true
+      address: 10.255.1.4
+  - id: 21
+    querier:
+      enabled: true
+      address: 10.255.1.4
+  - id: 22
+    querier:
+      enabled: true
+      address: 10.255.1.4
 ip_virtual_router_mac_address: 00:1c:73:00:00:99
 vxlan_interface:
   Vxlan1:
     description: dc1-leaf2a_VTEP
     vxlan:
       udp_port: 4789
-      source_interface: Loopback1
+      source_interface: Loopback0
+      mlag_source_interface: Loopback1
       virtual_router_encapsulation_mac_address: mlag-system-id
       vlans:
       - id: 11
         vni: 10011
+        multicast_group: 225.1.1.11
       - id: 12
         vni: 10012
+        multicast_group: 225.1.1.12
       - id: 21
         vni: 10021
+        multicast_group: 225.1.1.21
       - id: 22
         vni: 10022
-      - id: 3401
-        vni: 13401
-      - id: 3402
-        vni: 13402
+        multicast_group: 225.1.1.22
       vrfs:
       - name: VRF10
         vni: 10
+        multicast_group: 225.2.1.10
       - name: VRF11
         vni: 11
+        multicast_group: 225.2.1.11
 virtual_source_nat_vrfs:
 - name: VRF10
   ip_address: 10.255.10.4

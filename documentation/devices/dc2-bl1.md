@@ -14,13 +14,9 @@
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
   - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
-- [VLANs](#vlans)
-  - [VLANs Summary](#vlans-summary)
-  - [VLANs Device Configuration](#vlans-device-configuration)
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
-  - [VLAN Interfaces](#vlan-interfaces)
   - [VXLAN Interface](#vxlan-interface)
 - [Routing](#routing)
   - [Service Routing Protocols Model](#service-routing-protocols-model)
@@ -33,15 +29,14 @@
   - [Router BFD](#router-bfd)
 - [Multicast](#multicast)
   - [IP IGMP Snooping](#ip-igmp-snooping)
+  - [Router Multicast](#router-multicast)
+  - [PIM Sparse Mode](#pim-sparse-mode)
 - [Filters](#filters)
   - [Prefix-lists](#prefix-lists)
   - [Route-maps](#route-maps)
 - [VRF Instances](#vrf-instances)
   - [VRF Instances Summary](#vrf-instances-summary)
   - [VRF Instances Device Configuration](#vrf-instances-device-configuration)
-- [Virtual Source NAT](#virtual-source-nat)
-  - [Virtual Source NAT Summary](#virtual-source-nat-summary)
-  - [Virtual Source NAT Configuration](#virtual-source-nat-configuration)
 
 ## Management
 
@@ -169,42 +164,6 @@ spanning-tree mst 0 priority 4096
 vlan internal order ascending range 1006 1199
 ```
 
-## VLANs
-
-### VLANs Summary
-
-| VLAN ID | Name | Trunk Groups |
-| ------- | ---- | ------------ |
-| 11 | VRF10_VLAN11 | - |
-| 12 | VRF10_VLAN12 | - |
-| 21 | VRF11_VLAN21 | - |
-| 22 | VRF11_VLAN22 | - |
-| 3401 | L2_VLAN3401 | - |
-| 3402 | L2_VLAN3402 | - |
-
-### VLANs Device Configuration
-
-```eos
-!
-vlan 11
-   name VRF10_VLAN11
-!
-vlan 12
-   name VRF10_VLAN12
-!
-vlan 21
-   name VRF11_VLAN21
-!
-vlan 22
-   name VRF11_VLAN22
-!
-vlan 3401
-   name L2_VLAN3401
-!
-vlan 3402
-   name L2_VLAN3402
-```
-
 ## Interfaces
 
 ### Ethernet Interfaces
@@ -236,6 +195,7 @@ interface Ethernet1
    mtu 1500
    no switchport
    ip address 10.255.2.45/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet2
    description P2P_LINK_TO_DC2-SPINE2_Ethernet4
@@ -243,6 +203,7 @@ interface Ethernet2
    mtu 1500
    no switchport
    ip address 10.255.2.47/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet4
    description P2P_LINK_TO_dc1-bl1_Ethernet4
@@ -262,8 +223,6 @@ interface Ethernet4
 | --------- | ----------- | --- | ---------- |
 | Loopback0 | EVPN_Overlay_Peering | default | 10.255.2.6/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.2.22/32 |
-| Loopback10 | VRF10_VTEP_DIAGNOSTICS | VRF10 | 10.255.10.6/32 |
-| Loopback11 | VRF11_VTEP_DIAGNOSTICS | VRF11 | 10.255.11.6/32 |
 
 ##### IPv6
 
@@ -271,8 +230,6 @@ interface Ethernet4
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
-| Loopback10 | VRF10_VTEP_DIAGNOSTICS | VRF10 | - |
-| Loopback11 | VRF11_VTEP_DIAGNOSTICS | VRF11 | - |
 
 
 #### Loopback Interfaces Device Configuration
@@ -288,67 +245,6 @@ interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
    ip address 10.255.2.22/32
-!
-interface Loopback10
-   description VRF10_VTEP_DIAGNOSTICS
-   no shutdown
-   vrf VRF10
-   ip address 10.255.10.6/32
-!
-interface Loopback11
-   description VRF11_VTEP_DIAGNOSTICS
-   no shutdown
-   vrf VRF11
-   ip address 10.255.11.6/32
-```
-
-### VLAN Interfaces
-
-#### VLAN Interfaces Summary
-
-| Interface | Description | VRF |  MTU | Shutdown |
-| --------- | ----------- | --- | ---- | -------- |
-| Vlan11 | VRF10_VLAN11 | VRF10 | - | False |
-| Vlan12 | VRF10_VLAN12 | VRF10 | - | False |
-| Vlan21 | VRF11_VLAN21 | VRF11 | - | False |
-| Vlan22 | VRF11_VLAN22 | VRF11 | - | False |
-
-##### IPv4
-
-| Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | VRRP | ACL In | ACL Out |
-| --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
-| Vlan11 |  VRF10  |  -  |  10.10.11.1/24  |  -  |  -  |  -  |  -  |
-| Vlan12 |  VRF10  |  -  |  10.10.12.1/24  |  -  |  -  |  -  |  -  |
-| Vlan21 |  VRF11  |  -  |  10.10.21.1/24  |  -  |  -  |  -  |  -  |
-| Vlan22 |  VRF11  |  -  |  10.10.22.1/24  |  -  |  -  |  -  |  -  |
-
-#### VLAN Interfaces Device Configuration
-
-```eos
-!
-interface Vlan11
-   description VRF10_VLAN11
-   no shutdown
-   vrf VRF10
-   ip address virtual 10.10.11.1/24
-!
-interface Vlan12
-   description VRF10_VLAN12
-   no shutdown
-   vrf VRF10
-   ip address virtual 10.10.12.1/24
-!
-interface Vlan21
-   description VRF11_VLAN21
-   no shutdown
-   vrf VRF11
-   ip address virtual 10.10.21.1/24
-!
-interface Vlan22
-   description VRF11_VLAN22
-   no shutdown
-   vrf VRF11
-   ip address virtual 10.10.22.1/24
 ```
 
 ### VXLAN Interface
@@ -360,24 +256,6 @@ interface Vlan22
 | Source Interface | Loopback1 |
 | UDP port | 4789 |
 
-##### VLAN to VNI, Flood List and Multicast Group Mappings
-
-| VLAN | VNI | Flood List | Multicast Group |
-| ---- | --- | ---------- | --------------- |
-| 11 | 10011 | - | - |
-| 12 | 10012 | - | - |
-| 21 | 10021 | - | - |
-| 22 | 10022 | - | - |
-| 3401 | 13401 | - | - |
-| 3402 | 13402 | - | - |
-
-##### VRF to VNI and Multicast Group Mappings
-
-| VRF | VNI | Multicast Group |
-| ---- | --- | --------------- |
-| VRF10 | 10 | - |
-| VRF11 | 11 | - |
-
 #### VXLAN Interface Device Configuration
 
 ```eos
@@ -386,14 +264,6 @@ interface Vxlan1
    description dc2-bl1_VTEP
    vxlan source-interface Loopback1
    vxlan udp-port 4789
-   vxlan vlan 11 vni 10011
-   vxlan vlan 12 vni 10012
-   vxlan vlan 21 vni 10021
-   vxlan vlan 22 vni 10022
-   vxlan vlan 3401 vni 13401
-   vxlan vlan 3402 vni 13402
-   vxlan vrf VRF10 vni 10
-   vxlan vrf VRF11 vni 11
 ```
 
 ## Routing
@@ -428,8 +298,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 | --- | --------------- |
 | default | True |
 | MGMT | False |
-| VRF10 | True |
-| VRF11 | True |
 
 #### IP Routing Device Configuration
 
@@ -437,8 +305,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 !
 ip routing
 no ip routing vrf MGMT
-ip routing vrf VRF10
-ip routing vrf VRF11
 ```
 
 ### IPv6 Routing
@@ -449,8 +315,6 @@ ip routing vrf VRF11
 | --- | --------------- |
 | default | False |
 | MGMT | false |
-| VRF10 | false |
-| VRF11 | false |
 
 ### Static Routes
 
@@ -519,24 +383,6 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | ---------- | -------- | ------------- |
 | EVPN-OVERLAY-PEERS | True | default |
 
-#### Router BGP VLANs
-
-| VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
-| ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
-| 11 | 10.255.2.6:10011 | 10011:10011 | - | - | learned |
-| 12 | 10.255.2.6:10012 | 10012:10012 | - | - | learned |
-| 21 | 10.255.2.6:10021 | 10021:10021 | - | - | learned |
-| 22 | 10.255.2.6:10022 | 10022:10022 | - | - | learned |
-| 3401 | 10.255.2.6:13401 | 13401:13401 | - | - | learned |
-| 3402 | 10.255.2.6:13402 | 13402:13402 | - | - | learned |
-
-#### Router BGP VRFs
-
-| VRF | Route-Distinguisher | Redistribute |
-| --- | ------------------- | ------------ |
-| VRF10 | 10.255.2.6:10 | connected |
-| VRF11 | 10.255.2.6:11 | connected |
-
 #### Router BGP Device Configuration
 
 ```eos
@@ -573,56 +419,12 @@ router bgp 65203
    neighbor 172.100.100.0 description dc1-bl1
    redistribute connected route-map RM-CONN-2-BGP
    !
-   vlan 11
-      rd 10.255.2.6:10011
-      route-target both 10011:10011
-      redistribute learned
-   !
-   vlan 12
-      rd 10.255.2.6:10012
-      route-target both 10012:10012
-      redistribute learned
-   !
-   vlan 21
-      rd 10.255.2.6:10021
-      route-target both 10021:10021
-      redistribute learned
-   !
-   vlan 22
-      rd 10.255.2.6:10022
-      route-target both 10022:10022
-      redistribute learned
-   !
-   vlan 3401
-      rd 10.255.2.6:13401
-      route-target both 13401:13401
-      redistribute learned
-   !
-   vlan 3402
-      rd 10.255.2.6:13402
-      route-target both 13402:13402
-      redistribute learned
-   !
    address-family evpn
       neighbor EVPN-OVERLAY-PEERS activate
    !
    address-family ipv4
       no neighbor EVPN-OVERLAY-PEERS activate
       neighbor IPv4-UNDERLAY-PEERS activate
-   !
-   vrf VRF10
-      rd 10.255.2.6:10
-      route-target import evpn 10:10
-      route-target export evpn 10:10
-      router-id 10.255.2.6
-      redistribute connected
-   !
-   vrf VRF11
-      rd 10.255.2.6:11
-      route-target import evpn 11:11
-      route-target export evpn 11:11
-      router-id 10.255.2.6
-      redistribute connected
 ```
 
 ## BFD
@@ -657,6 +459,33 @@ router bfd
 
 ```eos
 ```
+
+### Router Multicast
+
+#### IP Router Multicast Summary
+
+- Routing for IPv4 multicast is enabled.
+- Software forwarding by the Software Forwarding Engine (SFE)
+
+#### Router Multicast Device Configuration
+
+```eos
+!
+router multicast
+   ipv4
+      routing
+      software-forwarding sfe
+```
+
+
+### PIM Sparse Mode
+
+#### PIM Sparse Mode enabled interfaces
+
+| Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
+| -------------- | -------- | ---------- | ----------- | --------------- |
+| Ethernet1 | - | IPv4 | - | - |
+| Ethernet2 | - | IPv4 | - | - |
 
 ## Filters
 
@@ -705,33 +534,10 @@ route-map RM-CONN-2-BGP permit 10
 | VRF Name | IP Routing |
 | -------- | ---------- |
 | MGMT | disabled |
-| VRF10 | enabled |
-| VRF11 | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
 !
 vrf instance MGMT
-!
-vrf instance VRF10
-!
-vrf instance VRF11
-```
-
-## Virtual Source NAT
-
-### Virtual Source NAT Summary
-
-| Source NAT VRF | Source NAT IP Address |
-| -------------- | --------------------- |
-| VRF10 | 10.255.10.6 |
-| VRF11 | 10.255.11.6 |
-
-### Virtual Source NAT Configuration
-
-```eos
-!
-ip address virtual source-nat vrf VRF10 address 10.255.10.6
-ip address virtual source-nat vrf VRF11 address 10.255.11.6
 ```

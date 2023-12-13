@@ -6,6 +6,15 @@ tenants:
   - name: TENANT1
     # Number used to generate the VNI of each VLAN by adding the VLAN number in this tenant.
     mac_vrf_vni_base: 10000
+    vlan_aware_bundle_number_base: 20000
+    evpn_l2_multicast:
+      enabled: true
+      underlay_l2_multicast_group_ipv4_pool: 225.1.1.0/24
+      underlay_l2_multicast_group_ipv4_pool_offset: 1
+    evpn_l3_multicast:
+      enabled: true
+      evpn_underlay_l3_multicast_group_ipv4_pool: 225.2.1.0/24
+      evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
     vrfs:
       # VRF definitions inside the tenant.
       - name: VRF10
@@ -22,12 +31,14 @@ tenants:
         svis:
           # SVI definitions.
           - id: 11
+            tags: [ VRF10_VLANS ]
             # SVI Description
             name: VRF10_VLAN11
             enabled: true
             # IP anycast gateway to be used in the SVI in every leaf.
             ip_address_virtual: 10.10.11.1/24
           - id: 12
+            tags: [ VRF10_VLANS ]
             name: VRF10_VLAN12
             enabled: true
             ip_address_virtual: 10.10.12.1/24
@@ -38,11 +49,13 @@ tenants:
           loopback_ip_range: 10.255.11.0/27
         svis:
           - id: 21
+            tags: [ VRF11_VLANS ]
             name: VRF11_VLAN21
             enabled: true
             ip_address_virtual: 10.10.21.1/24
           - id: 22
             name: VRF11_VLAN22
+            tags: [ VRF11_VLANS ]
             enabled: true
             ip_address_virtual: 10.10.22.1/24
 

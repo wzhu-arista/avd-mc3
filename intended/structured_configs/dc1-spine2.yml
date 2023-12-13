@@ -94,6 +94,9 @@ static_routes:
   gateway: 192.168.124.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
+router_multicast:
+  ipv4:
+    routing: true
 vlan_internal_order:
   allocation: ascending
   range:
@@ -135,6 +138,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.34/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet2
   peer: dc1-leaf2a
   peer_interface: Ethernet2
@@ -144,6 +150,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.38/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet3
   peer: dc1-leaf2b
   peer_interface: Ethernet2
@@ -153,6 +162,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.42/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet4
   peer: dc1-bl1
   peer_interface: Ethernet2
@@ -162,6 +174,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.46/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet5
   peer: dc1-bl2
   peer_interface: Ethernet2
@@ -171,6 +186,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.1.50/31
+  pim:
+    ipv4:
+      sparse_mode: true
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering

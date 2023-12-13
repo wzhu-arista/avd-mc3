@@ -136,8 +136,6 @@ vlan internal order ascending range 1006 1199
 | 12 | VRF10_VLAN12 | - |
 | 21 | VRF11_VLAN21 | - |
 | 22 | VRF11_VLAN22 | - |
-| 3401 | L2_VLAN3401 | - |
-| 3402 | L2_VLAN3402 | - |
 
 ### VLANs Device Configuration
 
@@ -154,12 +152,6 @@ vlan 21
 !
 vlan 22
    name VRF11_VLAN22
-!
-vlan 3401
-   name L2_VLAN3401
-!
-vlan 3402
-   name L2_VLAN3402
 ```
 
 ## Routing

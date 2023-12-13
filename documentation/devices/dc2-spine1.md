@@ -25,6 +25,9 @@
   - [Router BGP](#router-bgp)
 - [BFD](#bfd)
   - [Router BFD](#router-bfd)
+- [Multicast](#multicast)
+  - [Router Multicast](#router-multicast)
+  - [PIM Sparse Mode](#pim-sparse-mode)
 - [Filters](#filters)
   - [Prefix-lists](#prefix-lists)
   - [Route-maps](#route-maps)
@@ -184,6 +187,7 @@ interface Ethernet1
    mtu 1500
    no switchport
    ip address 10.255.2.32/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet2
    description P2P_LINK_TO_DC2-LEAF2A_Ethernet1
@@ -191,6 +195,7 @@ interface Ethernet2
    mtu 1500
    no switchport
    ip address 10.255.2.36/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet3
    description P2P_LINK_TO_DC2-LEAF2B_Ethernet1
@@ -198,6 +203,7 @@ interface Ethernet3
    mtu 1500
    no switchport
    ip address 10.255.2.40/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet4
    description P2P_LINK_TO_DC2-BL1_Ethernet1
@@ -205,6 +211,7 @@ interface Ethernet4
    mtu 1500
    no switchport
    ip address 10.255.2.44/31
+   pim ipv4 sparse-mode
 !
 interface Ethernet5
    description P2P_LINK_TO_DC2-BL2_Ethernet1
@@ -212,6 +219,7 @@ interface Ethernet5
    mtu 1500
    no switchport
    ip address 10.255.2.48/31
+   pim ipv4 sparse-mode
 ```
 
 ### Loopback Interfaces
@@ -428,6 +436,36 @@ router bgp 65200
 router bfd
    multihop interval 300 min-rx 300 multiplier 3
 ```
+
+## Multicast
+
+### Router Multicast
+
+#### IP Router Multicast Summary
+
+- Routing for IPv4 multicast is enabled.
+
+#### Router Multicast Device Configuration
+
+```eos
+!
+router multicast
+   ipv4
+      routing
+```
+
+
+### PIM Sparse Mode
+
+#### PIM Sparse Mode enabled interfaces
+
+| Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
+| -------------- | -------- | ---------- | ----------- | --------------- |
+| Ethernet1 | - | IPv4 | - | - |
+| Ethernet2 | - | IPv4 | - | - |
+| Ethernet3 | - | IPv4 | - | - |
+| Ethernet4 | - | IPv4 | - | - |
+| Ethernet5 | - | IPv4 | - | - |
 
 ## Filters
 
