@@ -61,7 +61,7 @@ l3leaf:
     # Definitions under the group will be inherited by both nodes in the group
     - group: DC2_L3_LEAF1
       filter:
-        tenants: [all]
+        tenants: [TENANT2]
         tags: [all]
       # ASN to be used by BGP for the group. Both devices in the MLAG pair will use the same BGP ASN
       # bgp_as: 65201
@@ -79,7 +79,7 @@ l3leaf:
             - Ethernet1
     - group: DC2_L3_LEAF2
       filter:
-        tenants: [all]
+        tenants: [TENANT2]
         tags: [all]
       bgp_as: 65202
       nodes: 
@@ -97,7 +97,7 @@ l3leaf:
             - Ethernet3
     - group: DC2_L3_BL
       filter:
-        tenants: [all]
+        tenants: [TENENT2]
         tags: [none]
       # bgp_as: 65203
       mlag: false
@@ -144,6 +144,6 @@ l2leaf:
       nodes:
         - name: dc2-leaf2c
           id: 1
-          mgmt_ip: 192.168.124.107/24
+          mgmt_ip: 192.168.124.117/24
           uplink_switch_interfaces: [Ethernet4, Ethernet4]
           # short_esi: 0001:0101:0101

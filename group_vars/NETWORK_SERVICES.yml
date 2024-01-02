@@ -6,59 +6,130 @@ tenants:
   - name: TENANT1
     # Number used to generate the VNI of each VLAN by adding the VLAN number in this tenant.
     mac_vrf_vni_base: 10000
-    vlan_aware_bundle_number_base: 20000
-    evpn_l2_multicast:
-      enabled: true
-      underlay_l2_multicast_group_ipv4_pool: 225.1.1.0/24
-      underlay_l2_multicast_group_ipv4_pool_offset: 1
+    vlan_aware_bundle_number_base: 11000
+    # evpn_l2_multicast:
+    #   enabled: true
+    #   underlay_l2_multicast_group_ipv4_pool: 225.1.1.0/24
+    #   underlay_l2_multicast_group_ipv4_pool_offset: 1
     evpn_l3_multicast:
       enabled: true
-      evpn_underlay_l3_multicast_group_ipv4_pool: 225.2.1.0/24
+      evpn_underlay_l3_multicast_group_ipv4_pool: 225.1.2.0/24
       evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
     vrfs:
       # VRF definitions inside the tenant.
-      - name: VRF10
+      - name: VRF100
         # VRF VNI definition.
-        vrf_vni: 10
+        vrf_vni: 100
         # Enable VTEP Network diagnostics
         # This will create a loopback with virtual source-nat enable to perform diagnostics from the switch.
         vtep_diagnostic:
           # Loopback interface number
-          loopback: 10
+          loopback: 100
           # Loopback ip range, a unique ip is derived from this ranged and assigned
           # to each l3 leaf based on it's unique id.
-          loopback_ip_range: 10.255.10.0/27
+          loopback_ip_range: 10.255.100.0/27
         svis:
           # SVI definitions.
-          - id: 11
-            tags: [ VRF10_VLANS ]
+          - id: 101
+            tags: [ VRF100_VLANS ]
             # SVI Description
-            name: VRF10_VLAN11
+            name: VRF100_VLAN101
             enabled: true
             # IP anycast gateway to be used in the SVI in every leaf.
-            ip_address_virtual: 10.10.11.1/24
-          - id: 12
-            tags: [ VRF10_VLANS ]
-            name: VRF10_VLAN12
+            ip_address_virtual: 10.10.101.1/24
+          - id: 102
+            tags: [ VRF100_VLANS ]
+            name: VRF100_VLAN102
             enabled: true
-            ip_address_virtual: 10.10.12.1/24
-      - name: VRF11
-        vrf_vni: 11
+            ip_address_virtual: 10.10.102.1/24
+      - name: VRF110
+        vrf_vni: 110
         vtep_diagnostic:
-          loopback: 11
-          loopback_ip_range: 10.255.11.0/27
+          loopback: 110
+          loopback_ip_range: 10.255.110.0/27
         svis:
-          - id: 21
-            tags: [ VRF11_VLANS ]
-            name: VRF11_VLAN21
+          - id: 111
+            tags: [ VRF110_VLANS ]
+            name: VRF110_VLAN111
             enabled: true
-            ip_address_virtual: 10.10.21.1/24
-          - id: 22
-            name: VRF11_VLAN22
-            tags: [ VRF11_VLANS ]
+            ip_address_virtual: 10.10.111.1/24
+          - id: 112
+            tags: [ VRF110_VLANS ]
+            name: VRF110_VLAN112
             enabled: true
-            ip_address_virtual: 10.10.22.1/24
+            ip_address_virtual: 10.10.112.1/24
 
+  # Definition of tenants. Additional level of abstraction to VRFs
+  - name: TENANT2
+    # Number used to generate the VNI of each VLAN by adding the VLAN number in this tenant.
+    mac_vrf_vni_base: 20000
+    vlan_aware_bundle_number_base: 21000
+    # evpn_l2_multicast:
+    #   enabled: true
+    #   underlay_l2_multicast_group_ipv4_pool: 225.2.1.0/24
+    #   underlay_l2_multicast_group_ipv4_pool_offset: 1
+    evpn_l3_multicast:
+      enabled: true
+      evpn_underlay_l3_multicast_group_ipv4_pool: 225.2.2.0/24
+      evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
+    vrfs:
+      # VRF definitions inside the tenant.
+      - name: VRF200
+        # VRF VNI definition.
+        vrf_vni: 200
+        # Enable VTEP Network diagnostics
+        # This will create a loopback with virtual source-nat enable to perform diagnostics from the switch.
+        vtep_diagnostic:
+          # Loopback interface number
+          loopback: 200
+          # Loopback ip range, a unique ip is derived from this ranged and assigned
+          # to each l3 leaf based on it's unique id.
+          loopback_ip_range: 10.255.200.0/27
+      # bgp:
+      #   tags: [ DC1 ]
+      #   structured_config:
+      #     redistribute_routes:
+      #       connected:
+      #         route_map: RM-TAG-CONN
+      #       static:
+      #         route_map: RM-STATIC-2-BGP
+      #     address_families:
+      #       ipv4:
+      #         bgp:
+      #           missing_policy:
+      #             direction_out_action: deny
+      #           additional_paths:
+      #             - install
+        svis:
+          # SVI definitions.
+          - id: 201
+            tags: [ VRF200_VLANS ]
+            # SVI Description
+            name: VRF200_VLAN201
+            enabled: true
+            # IP anycast gateway to be used in the SVI in every leaf.
+            ip_address_virtual: 10.10.201.1/24
+          - id: 202
+            tags: [ VRF200_VLANS ]
+            name: VRF200_VLAN202
+            enabled: true
+            ip_address_virtual: 10.10.202.1/24
+      - name: VRF210
+        vrf_vni: 210
+        vtep_diagnostic:
+          loopback: 210
+          loopback_ip_range: 10.255.210.0/27
+        svis:
+          - id: 211
+            tags: [ VRF210_VLANS ]
+            name: VRF210_VLAN211
+            enabled: true
+            ip_address_virtual: 10.10.211.1/24
+          - id: 212
+            tags: [ VRF210_VLANS ]
+            name: VRF210_VLAN212            
+            enabled: true
+            ip_address_virtual: 10.10.212.1/24
     # l2vlans:
     #   # These are pure L2 vlans. They do not have a SVI defined in the l3leafs and they will be bridged inside the VXLAN fabric
     #   - id: 3401

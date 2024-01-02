@@ -25,6 +25,8 @@ fabric_name: FABRIC
 underlay_routing_protocol: ebgp
 overlay_routing_protocol: ebgp
 
+bgp_update_wait_install: false
+
 evpn_vlan_aware_bundles: true
 underlay_multicast: true
 evpn_multicast: true
@@ -106,3 +108,12 @@ aaa_authorization:
 
 # custom_templates:
 #   - dcgw.j2   
+
+custom_structured_configuration_router_bfd:
+  interval: 2000
+  min_rx: 2000
+  multiplier: 3
+  multihop:
+    interval: 2000
+    min_rx: 2000
+    multiplier: 3

@@ -8,10 +8,10 @@ deploy: ## Complete AVD & cEOS-Lab Deployment
 	@sudo containerlab deploy -t topology.yml
 	@echo -e "\n############### \e[1;30;42mGenerating and deploying switch configuration\e[0m ###############\n"
 	@ansible-playbook playbooks/deploy.yml --flush-cache
-##	@echo -e "\n############### \e[1;30;42mConfiguring client nodes\e[0m ###############\n"
-##	@sudo bash host_l3_config/l3_build.sh
-	@echo -e "\n############### \e[1;30;42mConfiguring Servers\e[0m ###############\n"
-	@ansible-playbook playbooks/server.yml
+	@echo -e "\n############### \e[1;30;42mConfiguring client nodes\e[0m ###############\n"
+	@sudo bash host_l3_config/l3_build.sh
+	# @echo -e "\n############### \e[1;30;42mConfiguring Servers\e[0m ###############\n"
+	# @ansible-playbook playbooks/server.yml
 	@echo -e "\n############### \e[1;30;42mcEOS-Lab Topology\e[0m ###############\n"
 	@sudo containerlab inspect -t topology.yml
 	@echo -e "\n############### \e[1;30;42mcEOS-Lab Deployment Complete\e[0m ###############\n"

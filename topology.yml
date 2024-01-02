@@ -1,4 +1,4 @@
-name: dci
+name: mc3
 
 topology:
   kinds:
@@ -6,7 +6,7 @@ topology:
       # binds:
       #   - ma1mapping.json:/mnt/flash/EosIntfMapping.json:ro
       startup-config: ./ceos_lab_template/ceos.cfg.tpl
-      image: ceos:4.31.0F
+      image: ceos:20231129
     linux:
       image: alpine-host
 
