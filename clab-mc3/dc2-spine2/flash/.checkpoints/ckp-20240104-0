@@ -1,0 +1,54 @@
+! The checkpoint file saved at Thu Jan  4 14:49:48 2024 by admin
+! device: dc2-spine2 (cEOSLab, EOS-4.31.2F-34453087.eostrunkshipping (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$R7dWR2TfC6IaZtNT$sZY6ZS2sBML1WgrT/m1rS1BRc81KS94vo0ep2JASpIdcQ1/H0ZnTZOmUoKYBGojDjMFHraCowfmTGaDnua1Ke.
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname dc2-spine2
+!
+spanning-tree mode mstp
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vrf instance MGMT
+!
+management api http-commands
+   no shutdown
+   !
+   vrf MGMT
+      no shutdown
+!
+aaa authorization exec default local
+!
+interface Ethernet1
+!
+interface Ethernet2
+!
+interface Ethernet3
+!
+interface Ethernet4
+!
+interface Ethernet5
+!
+interface Management0
+   description oob_management
+   vrf MGMT
+   ip address 192.168.124.112/24
+!
+no ip routing
+no ip routing vrf MGMT
+!
+ip route vrf MGMT 0.0.0.0/0 192.168.124.1
+!
+router multicast
+   ipv4
+      software-forwarding sfe
+!
+end

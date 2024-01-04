@@ -37,10 +37,10 @@ sudo route -n'
 # sudo route -n'
 
 echo "[INFO] Configuring clab-mc2-client1"
-docker exec -it  clab-dci-dc1-server1 /bin/sh -c "$CMD1"
+docker exec -it  clab-dci-mc3-server1 /bin/sh -c "$CMD1"
 
 echo "[INFO] Configuring clab-mc2-client2"
-docker exec -it  clab-dci-dc1-server2 /bin/sh -c "$CMD2"
+docker exec -it  clab-dci-mc3-server2 /bin/sh -c "$CMD2"
 
 # echo "[INFO] Configuring clab-avdirb-client3"
 # docker exec -it  clab-avdirb-client3 /bin/sh -c "$CMD3"

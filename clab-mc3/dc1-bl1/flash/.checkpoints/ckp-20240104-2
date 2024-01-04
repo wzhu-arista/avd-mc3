@@ -1,0 +1,245 @@
+! The checkpoint file saved at Thu Jan  4 15:37:47 2024 by admin
+! device: dc1-bl1 (cEOSLab, EOS-4.31.2F-34453087.eostrunkshipping (engineering build))
+!
+no aaa root
+!
+username admin privilege 15 role network-admin secret sha512 $6$7GTxsrRjnwheeKfR$zhJ8qycVjAJz41rf5JRSfWIzp93IL5WL7sMS/Taz1yfShz.MAnoajCf7R2n1/EZW7PN5QA3Huayl0lVQesBYN1
+username ansible privilege 15 role network-admin secret sha512 $6$7u4j1rkb3VELgcZE$EJt2Qff8kd/TapRoci0XaIZsL4tFzgq1YZBLD9c6f/knXzvcYY0NcMKndZeCv0T268knGKhOEwZAxqKjlMm920
+!
+vlan internal order ascending range 1006 1199
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model multi-agent
+!
+hostname dc1-bl1
+!
+spanning-tree mode mstp
+spanning-tree mst 0 priority 4096
+!
+system l1
+   unsupported speed action error
+   unsupported error-correction action error
+!
+vlan 101
+   name VRF100_VLAN101
+!
+vlan 102
+   name VRF100_VLAN102
+!
+vlan 111
+   name VRF110_VLAN111
+!
+vlan 112
+   name VRF110_VLAN112
+!
+vrf instance MGMT
+!
+vrf instance VRF100
+!
+vrf instance VRF110
+!
+management api http-commands
+   no shutdown
+   !
+   vrf MGMT
+      no shutdown
+!
+aaa authorization exec default local
+!
+interface Ethernet1
+   description P2P_LINK_TO_DC1-SPINE1_Ethernet4
+   mtu 1500
+   no switchport
+   ip address 10.255.1.45/31
+   pim ipv4 sparse-mode
+!
+interface Ethernet2
+   description P2P_LINK_TO_DC1-SPINE2_Ethernet4
+   mtu 1500
+   no switchport
+   ip address 10.255.1.47/31
+   pim ipv4 sparse-mode
+!
+interface Ethernet3
+!
+interface Ethernet4
+   description P2P_LINK_TO_dc2-bl1_Ethernet4
+   mtu 1500
+   no switchport
+   ip address 172.100.100.0/31
+!
+interface Ethernet4.121
+   description To-DC2-BL1-VRF200
+   mtu 1500
+   encapsulation dot1q vlan 121
+   vrf VRF100
+   ip address 10.0.0.0/31
+!
+interface Loopback0
+   description EVPN_Overlay_Peering
+   ip address 10.255.1.6/32
+!
+interface Loopback1
+   description VTEP_VXLAN_Tunnel_Source
+   ip address 10.255.1.22/32
+!
+interface Loopback100
+   description VRF100_VTEP_DIAGNOSTICS
+   vrf VRF100
+   ip address 10.255.100.6/32
+!
+interface Loopback110
+   description VRF110_VTEP_DIAGNOSTICS
+   vrf VRF110
+   ip address 10.255.110.6/32
+!
+interface Management0
+   description oob_management
+   vrf MGMT
+   ip address 192.168.124.109/24
+!
+interface Vlan101
+   description VRF100_VLAN101
+   vrf VRF100
+   ip igmp
+   pim ipv4 local-interface Loopback100
+   ip address virtual 10.10.101.1/24
+!
+interface Vlan102
+   description VRF100_VLAN102
+   vrf VRF100
+   ip igmp
+   pim ipv4 local-interface Loopback100
+   ip address virtual 10.10.102.1/24
+!
+interface Vlan111
+   description VRF110_VLAN111
+   vrf VRF110
+   ip igmp
+   pim ipv4 local-interface Loopback110
+   ip address virtual 10.10.111.1/24
+!
+interface Vlan112
+   description VRF110_VLAN112
+   vrf VRF110
+   ip igmp
+   pim ipv4 local-interface Loopback110
+   ip address virtual 10.10.112.1/24
+!
+interface Vxlan1
+   description dc1-bl1_VTEP
+   vxlan source-interface Loopback1
+   vxlan udp-port 4789
+   vxlan vlan 101 vni 10101
+   vxlan vlan 102 vni 10102
+   vxlan vlan 111 vni 10111
+   vxlan vlan 112 vni 10112
+   vxlan vrf VRF100 vni 100
+   vxlan vrf VRF110 vni 110
+   vxlan vrf VRF100 multicast group 225.1.2.100
+   vxlan vrf VRF110 multicast group 225.1.2.110
+!
+ip virtual-router mac-address 00:1c:73:00:00:99
+ip address virtual source-nat vrf VRF100 address 10.255.100.6
+ip address virtual source-nat vrf VRF110 address 10.255.110.6
+!
+ip routing
+no ip routing vrf MGMT
+ip routing vrf VRF100
+ip routing vrf VRF110
+!
+ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+   seq 10 permit 10.255.1.0/28 eq 32
+   seq 20 permit 10.255.1.16/28 eq 32
+!
+ip route vrf MGMT 0.0.0.0/0 192.168.124.1
+!
+route-map RM-CONN-2-BGP permit 10
+   match ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+!
+router bfd
+   interval 2000 min-rx 2000 multiplier 3 default
+   multihop interval 2000 min-rx 2000 multiplier 3
+!
+router bgp 65103
+   router-id 10.255.1.6
+   no bgp default ipv4-unicast
+   maximum-paths 4 ecmp 4
+   neighbor EVPN-OVERLAY-PEERS peer group
+   neighbor EVPN-OVERLAY-PEERS update-source Loopback0
+   neighbor EVPN-OVERLAY-PEERS bfd
+   neighbor EVPN-OVERLAY-PEERS ebgp-multihop 3
+   neighbor EVPN-OVERLAY-PEERS password 7 Q4fqtbqcZ7oQuKfuWtNGRQ==
+   neighbor EVPN-OVERLAY-PEERS send-community
+   neighbor EVPN-OVERLAY-PEERS maximum-routes 0
+   neighbor IPv4-UNDERLAY-PEERS peer group
+   neighbor IPv4-UNDERLAY-PEERS password 7 7x4B4rnJhZB438m9+BrBfQ==
+   neighbor IPv4-UNDERLAY-PEERS send-community
+   neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
+   neighbor 10.255.1.1 peer group EVPN-OVERLAY-PEERS
+   neighbor 10.255.1.1 remote-as 65100
+   neighbor 10.255.1.1 description dc1-spine1
+   neighbor 10.255.1.2 peer group EVPN-OVERLAY-PEERS
+   neighbor 10.255.1.2 remote-as 65100
+   neighbor 10.255.1.2 description dc1-spine2
+   neighbor 10.255.1.44 peer group IPv4-UNDERLAY-PEERS
+   neighbor 10.255.1.44 remote-as 65100
+   neighbor 10.255.1.44 description dc1-spine1_Ethernet4
+   neighbor 10.255.1.46 peer group IPv4-UNDERLAY-PEERS
+   neighbor 10.255.1.46 remote-as 65100
+   neighbor 10.255.1.46 description dc1-spine2_Ethernet4
+   neighbor 172.100.100.1 peer group IPv4-UNDERLAY-PEERS
+   neighbor 172.100.100.1 remote-as 65203
+   neighbor 172.100.100.1 description dc2-bl1
+   redistribute connected route-map RM-CONN-2-BGP
+   !
+   vlan-aware-bundle VRF100
+      rd 10.255.1.6:11100
+      route-target both 11100:11100
+      redistribute learned
+      vlan 101-102
+   !
+   vlan-aware-bundle VRF110
+      rd 10.255.1.6:11110
+      route-target both 11110:11110
+      redistribute learned
+      vlan 111-112
+   !
+   address-family evpn
+      neighbor EVPN-OVERLAY-PEERS activate
+   !
+   address-family ipv4
+      no neighbor EVPN-OVERLAY-PEERS activate
+      neighbor IPv4-UNDERLAY-PEERS activate
+   !
+   vrf VRF100
+      rd 10.255.1.6:100
+      evpn multicast
+      route-target import evpn 100:100
+      route-target export evpn 100:100
+      router-id 10.255.1.6
+      redistribute connected
+   !
+   vrf VRF110
+      rd 10.255.1.6:110
+      evpn multicast
+      route-target import evpn 110:110
+      route-target export evpn 110:110
+      router-id 10.255.1.6
+      redistribute connected
+!
+router multicast
+   ipv4
+      routing
+      software-forwarding sfe
+   !
+   vrf VRF100
+      ipv4
+         routing
+   !
+   vrf VRF110
+      ipv4
+         routing
+!
+end

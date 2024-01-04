@@ -97,8 +97,7 @@ l3leaf:
             - Ethernet3
     - group: DC2_L3_BL
       filter:
-        tenants: [TENENT2]
-        tags: [none]
+        tenants: [TENANT2]
       # bgp_as: 65203
       mlag: false
       # evpn_gateway:

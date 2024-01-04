@@ -42,6 +42,44 @@ tenants:
             name: VRF100_VLAN102
             enabled: true
             ip_address_virtual: 10.10.102.1/24
+        l3_interfaces:
+          - interfaces:
+              - Ethernet4.121
+            encapsulation_dot1q_vlan:
+              - 121
+            ip_addresses:
+              - 10.0.0.0/31
+            nodes:
+              - dc1-bl1
+            description: To-DC2-BL1-VRF200
+            enabled: True
+            mtu: 1500
+          - interfaces:
+              - Ethernet4.122
+            encapsulation_dot1q_vlan:
+              - 122
+            ip_addresses:
+              - 10.0.0.2/31
+            nodes:
+              - dc1-bl2
+            description: To-DC2-BL2-VRF200
+            enabled: True
+            mtu: 1500
+        bgp_peers:
+          - ip_address: 10.0.0.1
+            peer_group: DCI-VRF100
+            remote_as: 65203
+            description: dc1-bl2-vrf200
+            nodes: 
+              - dc1-bl1
+            send_community: standard
+          - ip_address: 10.0.0.3
+            peer_group: DCI-VRF100
+            remote_as: 65203
+            description: dc2-bl2-vrf200
+            nodes: 
+              - dc1-bl2
+            send_community: standard 
       - name: VRF110
         vrf_vni: 110
         vtep_diagnostic:
@@ -85,21 +123,6 @@ tenants:
           # Loopback ip range, a unique ip is derived from this ranged and assigned
           # to each l3 leaf based on it's unique id.
           loopback_ip_range: 10.255.200.0/27
-      # bgp:
-      #   tags: [ DC1 ]
-      #   structured_config:
-      #     redistribute_routes:
-      #       connected:
-      #         route_map: RM-TAG-CONN
-      #       static:
-      #         route_map: RM-STATIC-2-BGP
-      #     address_families:
-      #       ipv4:
-      #         bgp:
-      #           missing_policy:
-      #             direction_out_action: deny
-      #           additional_paths:
-      #             - install
         svis:
           # SVI definitions.
           - id: 201
@@ -114,6 +137,44 @@ tenants:
             name: VRF200_VLAN202
             enabled: true
             ip_address_virtual: 10.10.202.1/24
+        l3_interfaces:
+          - interfaces:
+              - Ethernet4.121
+            encapsulation_dot1q_vlan:
+              - 121
+            ip_addresses:
+              - 10.0.0.1/31
+            nodes:
+              - dc2-bl1
+            description: To-DC1-BL1-VRF100
+            enabled: True
+            mtu: 1500
+          - interfaces:
+              - Ethernet4.122
+            encapsulation_dot1q_vlan:
+              - 122
+            ip_addresses:
+              - 10.0.0.3/31
+            nodes:
+              - dc2-bl2
+            description: To-DC1-BL2-VRF100
+            enabled: True
+            mtu: 1500     
+        bgp_peers:
+          - ip_address: 10.0.0.0
+            peer_group: DCI-VRF200
+            remote_as: 65103
+            description: dc1-bl1-vrf100
+            nodes: 
+              - dc2-bl1
+            send_community: standard
+          - ip_address: 10.0.0.2
+            peer_group: DCI-VRF200
+            remote_as: 65103
+            description: dc1-bl2-vrf100
+            nodes: 
+              - dc2-bl2
+            send_community: standard       
       - name: VRF210
         vrf_vni: 210
         vtep_diagnostic:

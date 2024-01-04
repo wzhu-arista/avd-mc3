@@ -1,0 +1,51 @@
+all:
+  vars:
+    # The generated inventory is assumed to be used from the clab host.
+    # Hence no http proxy should be used. Therefore we make sure the http
+    # module does not attempt using any global http proxy.
+    ansible_httpapi_use_proxy: false
+  children:
+    ceos:
+      hosts:
+        clab-mc3-dc1-bl1:
+          ansible_host: 192.168.124.109
+        clab-mc3-dc1-bl2:
+          ansible_host: 192.168.124.110
+        clab-mc3-dc1-leaf1:
+          ansible_host: 192.168.124.103
+        clab-mc3-dc1-leaf2a:
+          ansible_host: 192.168.124.105
+        clab-mc3-dc1-leaf2b:
+          ansible_host: 192.168.124.106
+        clab-mc3-dc1-leaf2c:
+          ansible_host: 192.168.124.107
+        clab-mc3-dc1-spine1:
+          ansible_host: 192.168.124.101
+        clab-mc3-dc1-spine2:
+          ansible_host: 192.168.124.102
+        clab-mc3-dc2-bl1:
+          ansible_host: 192.168.124.119
+        clab-mc3-dc2-bl2:
+          ansible_host: 192.168.124.120
+        clab-mc3-dc2-leaf1:
+          ansible_host: 192.168.124.113
+        clab-mc3-dc2-leaf2a:
+          ansible_host: 192.168.124.115
+        clab-mc3-dc2-leaf2b:
+          ansible_host: 192.168.124.116
+        clab-mc3-dc2-leaf2c:
+          ansible_host: 192.168.124.117
+        clab-mc3-dc2-spine1:
+          ansible_host: 192.168.124.111
+        clab-mc3-dc2-spine2:
+          ansible_host: 192.168.124.112
+    linux:
+      hosts:
+        clab-mc3-dc1-server1:
+          ansible_host: 192.168.124.104
+        clab-mc3-dc1-server2:
+          ansible_host: 192.168.124.108
+        clab-mc3-dc2-server1:
+          ansible_host: 192.168.124.114
+        clab-mc3-dc2-server2:
+          ansible_host: 192.168.124.118

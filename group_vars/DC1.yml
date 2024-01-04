@@ -98,7 +98,6 @@ l3leaf:
     - group: DC1_L3_BL
       filter:
         tenants: [TENANT1]
-        tags: [DC1]
       # bgp_as: 65103
       mlag: false
       # evpn_gateway:
