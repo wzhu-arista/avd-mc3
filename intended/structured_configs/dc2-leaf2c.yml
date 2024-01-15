@@ -1,4 +1,6 @@
 hostname: dc2-leaf2c
+metadata:
+  platform: vEOS-lab
 is_deployed: true
 static_routes:
 - vrf: MGMT
@@ -72,23 +74,17 @@ ethernet_interfaces:
   spanning_tree_portfast: edge
 port_channel_interfaces:
 - name: Port-Channel1
-  description: DC2_L3_LEAF2_Po4
+  description: DC2-LEAF2A_Po4
   type: switched
   shutdown: false
   mode: trunk
-  vlans: 201-202,211-212
+  vlans: 201-202
 vlans:
 - id: 201
   name: VRF200_VLAN201
   tenant: TENANT2
 - id: 202
   name: VRF200_VLAN202
-  tenant: TENANT2
-- id: 211
-  name: VRF210_VLAN211
-  tenant: TENANT2
-- id: 212
-  name: VRF210_VLAN212
   tenant: TENANT2
 ip_igmp_snooping:
   globally_enabled: true

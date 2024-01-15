@@ -13,7 +13,7 @@
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
-  - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
+  - [Internal VLAN Allocation Policy Device Configuration](#internal-vlan-allocation-policy-device-configuration)
 - [VLANs](#vlans)
   - [VLANs Summary](#vlans-summary)
   - [VLANs Device Configuration](#vlans-device-configuration)
@@ -88,7 +88,7 @@ interface Management0
 | -------- | -------- | -------- |
 | MGMT | - | - |
 
-#### Management API HTTP Configuration
+#### Management API HTTP Device Configuration
 
 ```eos
 !
@@ -164,7 +164,7 @@ spanning-tree mst 0 priority 4096
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-### Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Device Configuration
 
 ```eos
 !
@@ -179,8 +179,6 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 201 | VRF200_VLAN201 | - |
 | 202 | VRF200_VLAN202 | - |
-| 211 | VRF210_VLAN211 | - |
-| 212 | VRF210_VLAN212 | - |
 
 ### VLANs Device Configuration
 
@@ -191,12 +189,6 @@ vlan 201
 !
 vlan 202
    name VRF200_VLAN202
-!
-vlan 211
-   name VRF210_VLAN211
-!
-vlan 212
-   name VRF210_VLAN212
 ```
 
 ## Interfaces
@@ -261,7 +253,6 @@ interface Ethernet3
 | Loopback0 | EVPN_Overlay_Peering | default | 10.255.2.3/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.2.19/32 |
 | Loopback200 | VRF200_VTEP_DIAGNOSTICS | VRF200 | 10.255.200.3/32 |
-| Loopback210 | VRF210_VTEP_DIAGNOSTICS | VRF210 | 10.255.210.3/32 |
 
 ##### IPv6
 
@@ -270,8 +261,6 @@ interface Ethernet3
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
 | Loopback200 | VRF200_VTEP_DIAGNOSTICS | VRF200 | - |
-| Loopback210 | VRF210_VTEP_DIAGNOSTICS | VRF210 | - |
-
 
 #### Loopback Interfaces Device Configuration
 
@@ -292,12 +281,6 @@ interface Loopback200
    no shutdown
    vrf VRF200
    ip address 10.255.200.3/32
-!
-interface Loopback210
-   description VRF210_VTEP_DIAGNOSTICS
-   no shutdown
-   vrf VRF210
-   ip address 10.255.210.3/32
 ```
 
 ### VLAN Interfaces
@@ -308,8 +291,6 @@ interface Loopback210
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan201 | VRF200_VLAN201 | VRF200 | - | False |
 | Vlan202 | VRF200_VLAN202 | VRF200 | - | False |
-| Vlan211 | VRF210_VLAN211 | VRF210 | - | False |
-| Vlan212 | VRF210_VLAN212 | VRF210 | - | False |
 
 ##### IPv4
 
@@ -317,8 +298,6 @@ interface Loopback210
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
 | Vlan201 |  VRF200  |  -  |  10.10.201.1/24  |  -  |  -  |  -  |  -  |
 | Vlan202 |  VRF200  |  -  |  10.10.202.1/24  |  -  |  -  |  -  |  -  |
-| Vlan211 |  VRF210  |  -  |  10.10.211.1/24  |  -  |  -  |  -  |  -  |
-| Vlan212 |  VRF210  |  -  |  10.10.212.1/24  |  -  |  -  |  -  |  -  |
 
 #### VLAN Interfaces Device Configuration
 
@@ -339,22 +318,6 @@ interface Vlan202
    ip igmp
    pim ipv4 local-interface Loopback200
    ip address virtual 10.10.202.1/24
-!
-interface Vlan211
-   description VRF210_VLAN211
-   no shutdown
-   vrf VRF210
-   ip igmp
-   pim ipv4 local-interface Loopback210
-   ip address virtual 10.10.211.1/24
-!
-interface Vlan212
-   description VRF210_VLAN212
-   no shutdown
-   vrf VRF210
-   ip igmp
-   pim ipv4 local-interface Loopback210
-   ip address virtual 10.10.212.1/24
 ```
 
 ### VXLAN Interface
@@ -372,15 +335,12 @@ interface Vlan212
 | ---- | --- | ---------- | --------------- |
 | 201 | 20201 | - | - |
 | 202 | 20202 | - | - |
-| 211 | 20211 | - | - |
-| 212 | 20212 | - | - |
 
 ##### VRF to VNI and Multicast Group Mappings
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
 | VRF200 | 200 | 225.2.2.200 |
-| VRF210 | 210 | 225.2.2.210 |
 
 #### VXLAN Interface Device Configuration
 
@@ -392,12 +352,8 @@ interface Vxlan1
    vxlan udp-port 4789
    vxlan vlan 201 vni 20201
    vxlan vlan 202 vni 20202
-   vxlan vlan 211 vni 20211
-   vxlan vlan 212 vni 20212
    vxlan vrf VRF200 vni 200
-   vxlan vrf VRF210 vni 210
    vxlan vrf VRF200 multicast group 225.2.2.200
-   vxlan vrf VRF210 multicast group 225.2.2.210
 ```
 
 ## Routing
@@ -415,9 +371,9 @@ service routing protocols model multi-agent
 
 #### Virtual Router MAC Address Summary
 
-##### Virtual Router MAC Address: 00:1c:73:00:00:99
+Virtual Router MAC Address: 00:1c:73:00:00:99
 
-#### Virtual Router MAC Address Configuration
+#### Virtual Router MAC Address Device Configuration
 
 ```eos
 !
@@ -433,7 +389,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 | default | True |
 | MGMT | False |
 | VRF200 | True |
-| VRF210 | True |
 
 #### IP Routing Device Configuration
 
@@ -442,7 +397,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 ip routing
 no ip routing vrf MGMT
 ip routing vrf VRF200
-ip routing vrf VRF210
 ```
 
 ### IPv6 Routing
@@ -454,14 +408,13 @@ ip routing vrf VRF210
 | default | False |
 | MGMT | false |
 | VRF200 | false |
-| VRF210 | false |
 
 ### Static Routes
 
 #### Static Routes Summary
 
-| VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
-| --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
+| VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
+| --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 192.168.124.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
@@ -527,14 +480,12 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | VLAN Aware Bundle | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute | VLANs |
 | ----------------- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ | ----- |
 | VRF200 | 10.255.2.3:21200 | 21200:21200 | - | - | learned | 201-202 |
-| VRF210 | 10.255.2.3:21210 | 21210:21210 | - | - | learned | 211-212 |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute | EVPN Multicast |
 | --- | ------------------- | ------------ | -------------- |
 | VRF200 | 10.255.2.3:200 | connected | IPv4: True<br>Transit: False |
-| VRF210 | 10.255.2.3:210 | connected | IPv4: True<br>Transit: False |
 
 #### Router BGP Device Configuration
 
@@ -575,12 +526,6 @@ router bgp 65201
       redistribute learned
       vlan 201-202
    !
-   vlan-aware-bundle VRF210
-      rd 10.255.2.3:21210
-      route-target both 21210:21210
-      redistribute learned
-      vlan 211-212
-   !
    address-family evpn
       neighbor EVPN-OVERLAY-PEERS activate
    !
@@ -593,14 +538,6 @@ router bgp 65201
       evpn multicast
       route-target import evpn 200:200
       route-target export evpn 200:200
-      router-id 10.255.2.3
-      redistribute connected
-   !
-   vrf VRF210
-      rd 10.255.2.3:210
-      evpn multicast
-      route-target import evpn 210:210
-      route-target export evpn 210:210
       router-id 10.255.2.3
       redistribute connected
 ```
@@ -657,7 +594,6 @@ router bfd
 | VRF Name | Multicast Routing |
 | -------- | ----------------- |
 | VRF200 | enabled |
-| VRF210 | enabled |
 
 #### Router Multicast Device Configuration
 
@@ -671,16 +607,11 @@ router multicast
    vrf VRF200
       ipv4
          routing
-   !
-   vrf VRF210
-      ipv4
-         routing
 ```
-
 
 ### PIM Sparse Mode
 
-#### PIM Sparse Mode enabled interfaces
+#### PIM Sparse Mode Enabled Interfaces
 
 | Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
 | -------------- | -------- | ---------- | ----------- | --------------- |
@@ -735,7 +666,6 @@ route-map RM-CONN-2-BGP permit 10
 | -------- | ---------- |
 | MGMT | disabled |
 | VRF200 | enabled |
-| VRF210 | enabled |
 
 ### VRF Instances Device Configuration
 
@@ -744,8 +674,6 @@ route-map RM-CONN-2-BGP permit 10
 vrf instance MGMT
 !
 vrf instance VRF200
-!
-vrf instance VRF210
 ```
 
 ## Virtual Source NAT
@@ -755,12 +683,10 @@ vrf instance VRF210
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
 | VRF200 | 10.255.200.3 |
-| VRF210 | 10.255.210.3 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
 ip address virtual source-nat vrf VRF200 address 10.255.200.3
-ip address virtual source-nat vrf VRF210 address 10.255.210.3
 ```

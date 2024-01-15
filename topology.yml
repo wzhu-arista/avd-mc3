@@ -6,7 +6,7 @@ topology:
       # binds:
       #   - ma1mapping.json:/mnt/flash/EosIntfMapping.json:ro
       startup-config: ./ceos_lab_template/ceos.cfg.tpl
-      image: ceos:20231129
+      image: ceos:20240115
     linux:
       image: alpine-host
 
@@ -75,6 +75,9 @@ topology:
     dc2-bl2:
       kind: ceos
       mgmt-ipv4: 192.168.124.120
+    rp:
+      kind: ceos
+      mgmt-ipv4: 192.168.124.121
 
 
   links:
@@ -115,7 +118,9 @@ topology:
     - endpoints: ["dc2-leaf2c:eth3", "dc2-server2:eth3"]  
     - endpoints: ["dc2-bl1:eth3", "dc2-bl2:eth3"]
     - endpoints: ["dc1-bl1:eth4", "dc2-bl1:eth4"]     
-    - endpoints: ["dc1-bl2:eth4", "dc2-bl2:eth4"]   
+    - endpoints: ["dc1-bl2:eth4", "dc2-bl2:eth4"]  
+    - endpoints: ["rp:eth1", "dc1-leaf2b:eth6"]  
+    - endpoints: ["rp:eth2", "dc2-leaf2a:eth6"]   
 
 mgmt:
   network: ceos_clab    

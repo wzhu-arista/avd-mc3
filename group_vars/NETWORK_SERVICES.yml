@@ -15,6 +15,9 @@ tenants:
       enabled: true
       evpn_underlay_l3_multicast_group_ipv4_pool: 225.1.2.0/24
       evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
+      evpn_peg:
+      - nodes: [dc1-bl1, dc1-bl2, dc1-leaf2a, dc1-leaf2b]
+        transit: true
     vrfs:
       # VRF definitions inside the tenant.
       - name: VRF100
@@ -28,6 +31,9 @@ tenants:
           # Loopback ip range, a unique ip is derived from this ranged and assigned
           # to each l3 leaf based on it's unique id.
           loopback_ip_range: 10.255.100.0/27
+        pim_rp_addresses:
+          - rps: [12.12.12.12]
+            nodes: [dc1-bl1, dc1-bl2, dc1-leaf2b]        
         svis:
           # SVI definitions.
           - id: 101
@@ -52,8 +58,10 @@ tenants:
             nodes:
               - dc1-bl1
             description: To-DC2-BL1-VRF200
-            enabled: True
-            mtu: 1500
+            enabled: true
+            mtu: 1500             
+            pim:
+              enabled: true
           - interfaces:
               - Ethernet4.122
             encapsulation_dot1q_vlan:
@@ -63,39 +71,61 @@ tenants:
             nodes:
               - dc1-bl2
             description: To-DC2-BL2-VRF200
-            enabled: True
+            enabled: true
             mtu: 1500
+            pim:
+              enabled: true        
+          - interfaces:
+              - Ethernet6.100
+            encapsulation_dot1q_vlan:
+              - 100
+            ip_addresses:
+              - 10.0.0.4/31
+            nodes:
+              - dc1-leaf2b
+            description: To-RP
+            enabled: true
+            mtu: 1500             
+            pim:
+              enabled: true             
         bgp_peers:
           - ip_address: 10.0.0.1
             peer_group: DCI-VRF100
-            remote_as: 65203
+            remote_as: 65204
             description: dc1-bl2-vrf200
             nodes: 
               - dc1-bl1
             send_community: standard
           - ip_address: 10.0.0.3
             peer_group: DCI-VRF100
-            remote_as: 65203
+            remote_as: 65205
             description: dc2-bl2-vrf200
             nodes: 
               - dc1-bl2
             send_community: standard 
-      - name: VRF110
-        vrf_vni: 110
-        vtep_diagnostic:
-          loopback: 110
-          loopback_ip_range: 10.255.110.0/27
-        svis:
-          - id: 111
-            tags: [ VRF110_VLANS ]
-            name: VRF110_VLAN111
-            enabled: true
-            ip_address_virtual: 10.10.111.1/24
-          - id: 112
-            tags: [ VRF110_VLANS ]
-            name: VRF110_VLAN112
-            enabled: true
-            ip_address_virtual: 10.10.112.1/24
+          - ip_address: 10.0.0.5
+            peer_group: RP-VRF100
+            remote_as: 100
+            description: rp-vrf100
+            nodes: 
+              - dc1-leaf2b
+            send_community: standard 
+      # - name: VRF110
+      #   vrf_vni: 110
+      #   vtep_diagnostic:
+      #     loopback: 110
+      #     loopback_ip_range: 10.255.110.0/27
+      #   svis:
+      #     - id: 111
+      #       tags: [ VRF110_VLANS ]
+      #       name: VRF110_VLAN111
+      #       enabled: true
+      #       ip_address_virtual: 10.10.111.1/24
+      #     - id: 112
+      #       tags: [ VRF110_VLANS ]
+      #       name: VRF110_VLAN112
+      #       enabled: true
+      #       ip_address_virtual: 10.10.112.1/24
 
   # Definition of tenants. Additional level of abstraction to VRFs
   - name: TENANT2
@@ -109,7 +139,10 @@ tenants:
     evpn_l3_multicast:
       enabled: true
       evpn_underlay_l3_multicast_group_ipv4_pool: 225.2.2.0/24
-      evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
+      evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1 
+      evpn_peg:
+      - nodes: [dc2-bl1, dc2-bl2, dc2-leaf2a, dc2-leaf2b]
+        transit: true        
     vrfs:
       # VRF definitions inside the tenant.
       - name: VRF200
@@ -123,6 +156,9 @@ tenants:
           # Loopback ip range, a unique ip is derived from this ranged and assigned
           # to each l3 leaf based on it's unique id.
           loopback_ip_range: 10.255.200.0/27
+        pim_rp_addresses:
+          - rps: [12.12.12.12]
+            nodes: [dc2-bl1, dc2-bl2, dc2-leaf2a]
         svis:
           # SVI definitions.
           - id: 201
@@ -147,8 +183,10 @@ tenants:
             nodes:
               - dc2-bl1
             description: To-DC1-BL1-VRF100
-            enabled: True
+            enabled: true         
             mtu: 1500
+            pim:
+              enabled: true         
           - interfaces:
               - Ethernet4.122
             encapsulation_dot1q_vlan:
@@ -158,39 +196,61 @@ tenants:
             nodes:
               - dc2-bl2
             description: To-DC1-BL2-VRF100
-            enabled: True
-            mtu: 1500     
+            enabled: true
+            mtu: 1500             
+            pim:
+              enabled: true     
+          - interfaces:
+              - Ethernet6.200
+            encapsulation_dot1q_vlan:
+              - 200
+            ip_addresses:
+              - 10.0.0.6/31
+            nodes:
+              - dc2-leaf2a
+            description: To-RP
+            enabled: true
+            mtu: 1500             
+            pim:
+              enabled: true     
         bgp_peers:
           - ip_address: 10.0.0.0
             peer_group: DCI-VRF200
-            remote_as: 65103
+            remote_as: 65104
             description: dc1-bl1-vrf100
             nodes: 
               - dc2-bl1
             send_community: standard
           - ip_address: 10.0.0.2
             peer_group: DCI-VRF200
-            remote_as: 65103
+            remote_as: 65105
             description: dc1-bl2-vrf100
             nodes: 
               - dc2-bl2
             send_community: standard       
-      - name: VRF210
-        vrf_vni: 210
-        vtep_diagnostic:
-          loopback: 210
-          loopback_ip_range: 10.255.210.0/27
-        svis:
-          - id: 211
-            tags: [ VRF210_VLANS ]
-            name: VRF210_VLAN211
-            enabled: true
-            ip_address_virtual: 10.10.211.1/24
-          - id: 212
-            tags: [ VRF210_VLANS ]
-            name: VRF210_VLAN212            
-            enabled: true
-            ip_address_virtual: 10.10.212.1/24
+          - ip_address: 10.0.0.7
+            peer_group: RP-VRF200
+            remote_as: 200
+            description: rp-vrf200
+            nodes: 
+              - dc2-leaf2a
+            send_community: standard 
+      # - name: VRF210
+      #   vrf_vni: 210
+      #   vtep_diagnostic:
+      #     loopback: 210
+      #     loopback_ip_range: 10.255.210.0/27
+      #   svis:
+      #     - id: 211
+      #       tags: [ VRF210_VLANS ]
+      #       name: VRF210_VLAN211
+      #       enabled: true
+      #       ip_address_virtual: 10.10.211.1/24
+      #     - id: 212
+      #       tags: [ VRF210_VLANS ]
+      #       name: VRF210_VLAN212            
+      #       enabled: true
+      #       ip_address_virtual: 10.10.212.1/24
     # l2vlans:
     #   # These are pure L2 vlans. They do not have a SVI defined in the l3leafs and they will be bridged inside the VXLAN fabric
     #   - id: 3401

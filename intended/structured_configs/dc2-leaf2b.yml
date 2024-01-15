@@ -1,7 +1,9 @@
 hostname: dc2-leaf2b
+metadata:
+  platform: vEOS-lab
 is_deployed: true
 router_bgp:
-  as: '65202'
+  as: '65203'
   router_id: 10.255.2.5
   bgp:
     default:
@@ -10,15 +12,6 @@ router_bgp:
     paths: 4
     ecmp: 4
   peer_groups:
-  - name: MLAG-IPv4-UNDERLAY-PEER
-    type: ipv4
-    remote_as: '65202'
-    next_hop_self: true
-    description: dc2-leaf2a
-    password: 4b21pAdCvWeAqpcKDFMdWw==
-    maximum_routes: 12000
-    send_community: all
-    route_map_in: RM-MLAG-PEER-IN
   - name: IPv4-UNDERLAY-PEERS
     type: ipv4
     password: 7x4B4rnJhZB438m9+BrBfQ==
@@ -34,17 +27,14 @@ router_bgp:
     ebgp_multihop: 3
   address_family_ipv4:
     peer_groups:
-    - name: MLAG-IPv4-UNDERLAY-PEER
-      activate: true
     - name: IPv4-UNDERLAY-PEERS
       activate: true
     - name: EVPN-OVERLAY-PEERS
       activate: false
+  redistribute_routes:
+  - source_protocol: connected
+    route_map: RM-CONN-2-BGP
   neighbors:
-  - ip_address: 10.255.2.98
-    peer_group: MLAG-IPv4-UNDERLAY-PEER
-    peer: dc2-leaf2a
-    description: dc2-leaf2a
   - ip_address: 10.255.2.40
     peer_group: IPv4-UNDERLAY-PEERS
     remote_as: '65200'
@@ -65,9 +55,6 @@ router_bgp:
     peer: dc2-spine2
     description: dc2-spine2
     remote_as: '65200'
-  redistribute_routes:
-  - source_protocol: connected
-    route_map: RM-CONN-2-BGP
   address_family_evpn:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
@@ -88,27 +75,6 @@ router_bgp:
     redistribute_routes:
     - source_protocol: connected
     evpn_multicast: true
-    neighbors:
-    - ip_address: 10.255.2.98
-      peer_group: MLAG-IPv4-UNDERLAY-PEER
-  - name: VRF210
-    router_id: 10.255.2.5
-    rd: 10.255.2.5:210
-    route_targets:
-      import:
-      - address_family: evpn
-        route_targets:
-        - 210:210
-      export:
-      - address_family: evpn
-        route_targets:
-        - 210:210
-    redistribute_routes:
-    - source_protocol: connected
-    evpn_multicast: true
-    neighbors:
-    - ip_address: 10.255.2.98
-      peer_group: MLAG-IPv4-UNDERLAY-PEER
   vlan_aware_bundles:
   - name: VRF200
     rd: 10.255.2.5:21200
@@ -118,14 +84,6 @@ router_bgp:
     redistribute_routes:
     - learned
     vlan: 201-202
-  - name: VRF210
-    rd: 10.255.2.5:21210
-    route_targets:
-      both:
-      - 21210:21210
-    redistribute_routes:
-    - learned
-    vlan: 211-212
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -140,9 +98,6 @@ router_multicast:
   - name: VRF200
     ipv4:
       routing: true
-  - name: VRF210
-    ipv4:
-      routing: true
 vlan_internal_order:
   allocation: ascending
   range:
@@ -153,7 +108,6 @@ spanning_tree:
   mst_instances:
   - id: '0'
     priority: 4096
-  no_spanning_tree_vlan: 4093-4094
 local_users:
 - name: admin
   privilege: 15
@@ -169,9 +123,6 @@ vrfs:
 - name: VRF200
   tenant: TENANT2
   ip_routing: true
-- name: VRF210
-  tenant: TENANT2
-  ip_routing: true
 management_interfaces:
 - name: Management0
   description: oob_management
@@ -184,154 +135,7 @@ management_api_http:
   enable_vrfs:
   - name: MGMT
   enable_https: true
-vlans:
-- id: 4093
-  tenant: system
-  name: LEAF_PEER_L3
-  trunk_groups:
-  - LEAF_PEER_L3
-- id: 4094
-  tenant: system
-  name: MLAG_PEER
-  trunk_groups:
-  - MLAG
-- id: 201
-  name: VRF200_VLAN201
-  tenant: TENANT2
-- id: 202
-  name: VRF200_VLAN202
-  tenant: TENANT2
-- id: 3199
-  name: MLAG_iBGP_VRF200
-  trunk_groups:
-  - LEAF_PEER_L3
-  tenant: TENANT2
-- id: 211
-  name: VRF210_VLAN211
-  tenant: TENANT2
-- id: 212
-  name: VRF210_VLAN212
-  tenant: TENANT2
-- id: 3209
-  name: MLAG_iBGP_VRF210
-  trunk_groups:
-  - LEAF_PEER_L3
-  tenant: TENANT2
-vlan_interfaces:
-- name: Vlan4093
-  description: MLAG_PEER_L3_PEERING
-  shutdown: false
-  mtu: 1500
-  ip_address: 10.255.2.99/31
-  pim:
-    ipv4:
-      sparse_mode: true
-- name: Vlan4094
-  description: MLAG_PEER
-  shutdown: false
-  ip_address: 10.255.2.67/31
-  no_autostate: true
-  mtu: 1500
-- name: Vlan201
-  tenant: TENANT2
-  tags:
-  - VRF200_VLANS
-  description: VRF200_VLAN201
-  shutdown: false
-  ip_address_virtual: 10.10.201.1/24
-  pim:
-    ipv4:
-      sparse_mode: true
-      local_interface: Loopback200
-  vrf: VRF200
-- name: Vlan202
-  tenant: TENANT2
-  tags:
-  - VRF200_VLANS
-  description: VRF200_VLAN202
-  shutdown: false
-  ip_address_virtual: 10.10.202.1/24
-  pim:
-    ipv4:
-      sparse_mode: true
-      local_interface: Loopback200
-  vrf: VRF200
-- name: Vlan3199
-  tenant: TENANT2
-  type: underlay_peering
-  shutdown: false
-  description: 'MLAG_PEER_L3_iBGP: vrf VRF200'
-  vrf: VRF200
-  mtu: 1500
-  ip_address: 10.255.2.99/31
-- name: Vlan211
-  tenant: TENANT2
-  tags:
-  - VRF210_VLANS
-  description: VRF210_VLAN211
-  shutdown: false
-  ip_address_virtual: 10.10.211.1/24
-  pim:
-    ipv4:
-      sparse_mode: true
-      local_interface: Loopback210
-  vrf: VRF210
-- name: Vlan212
-  tenant: TENANT2
-  tags:
-  - VRF210_VLANS
-  description: VRF210_VLAN212
-  shutdown: false
-  ip_address_virtual: 10.10.212.1/24
-  pim:
-    ipv4:
-      sparse_mode: true
-      local_interface: Loopback210
-  vrf: VRF210
-- name: Vlan3209
-  tenant: TENANT2
-  type: underlay_peering
-  shutdown: false
-  description: 'MLAG_PEER_L3_iBGP: vrf VRF210'
-  vrf: VRF210
-  mtu: 1500
-  ip_address: 10.255.2.99/31
-port_channel_interfaces:
-- name: Port-Channel3
-  description: MLAG_PEER_dc2-leaf2a_Po3
-  type: switched
-  shutdown: false
-  mode: trunk
-  trunk_groups:
-  - LEAF_PEER_L3
-  - MLAG
-- name: Port-Channel4
-  description: DC2-LEAF2C_Po1
-  type: switched
-  shutdown: false
-  mode: trunk
-  vlans: 201-202,211-212
-  mlag: 4
-- name: Port-Channel5
-  description: dc2-server2_PortChannel dc2-server2
-  type: switched
-  shutdown: false
-  mode: trunk
-  vlans: 201-202,211-212
-  native_vlan: 4092
-  spanning_tree_portfast: edge
-  mlag: 5
 ethernet_interfaces:
-- name: Ethernet3
-  peer: dc2-leaf2a
-  peer_interface: Ethernet3
-  peer_type: mlag_peer
-  description: MLAG_PEER_dc2-leaf2a_Ethernet3
-  type: port-channel-member
-  shutdown: false
-  channel_group:
-    id: 3
-    mode: active
 - name: Ethernet1
   peer: dc2-spine1
   peer_interface: Ethernet3
@@ -376,27 +180,21 @@ ethernet_interfaces:
   channel_group:
     id: 5
     mode: active
-mlag_configuration:
-  domain_id: DC2_L3_LEAF2
-  local_interface: Vlan4094
-  peer_address: 10.255.2.66
-  peer_link: Port-Channel3
-  reload_delay_mlag: '300'
-  reload_delay_non_mlag: '330'
-route_maps:
-- name: RM-MLAG-PEER-IN
-  sequence_numbers:
-  - sequence: 10
-    type: permit
-    set:
-    - origin incomplete
-    description: Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
-- name: RM-CONN-2-BGP
-  sequence_numbers:
-  - sequence: 10
-    type: permit
-    match:
-    - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+port_channel_interfaces:
+- name: Port-Channel4
+  description: DC2-LEAF2C_Po1
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: 201-202
+- name: Port-Channel5
+  description: dc2-server2_PortChannel dc2-server2
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: 201-202,211-212
+  native_vlan: 4092
+  spanning_tree_portfast: edge
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
@@ -405,17 +203,12 @@ loopback_interfaces:
 - name: Loopback1
   description: VTEP_VXLAN_Tunnel_Source
   shutdown: false
-  ip_address: 10.255.2.20/32
+  ip_address: 10.255.2.21/32
 - name: Loopback200
   description: VRF200_VTEP_DIAGNOSTICS
   shutdown: false
   vrf: VRF200
   ip_address: 10.255.200.5/32
-- name: Loopback210
-  description: VRF210_VTEP_DIAGNOSTICS
-  shutdown: false
-  vrf: VRF210
-  ip_address: 10.255.210.5/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -423,6 +216,13 @@ prefix_lists:
     action: permit 10.255.2.0/28 eq 32
   - sequence: 20
     action: permit 10.255.2.16/28 eq 32
+route_maps:
+- name: RM-CONN-2-BGP
+  sequence_numbers:
+  - sequence: 10
+    type: permit
+    match:
+    - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
 router_bfd:
   multihop:
     interval: 2000
@@ -431,35 +231,56 @@ router_bfd:
   interval: 2000
   min_rx: 2000
   multiplier: 3
+vlans:
+- id: 201
+  name: VRF200_VLAN201
+  tenant: TENANT2
+- id: 202
+  name: VRF200_VLAN202
+  tenant: TENANT2
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:00:99
+vlan_interfaces:
+- name: Vlan201
+  tenant: TENANT2
+  tags:
+  - VRF200_VLANS
+  description: VRF200_VLAN201
+  shutdown: false
+  ip_address_virtual: 10.10.201.1/24
+  ip_igmp: true
+  pim:
+    ipv4:
+      local_interface: Loopback200
+  vrf: VRF200
+- name: Vlan202
+  tenant: TENANT2
+  tags:
+  - VRF200_VLANS
+  description: VRF200_VLAN202
+  shutdown: false
+  ip_address_virtual: 10.10.202.1/24
+  ip_igmp: true
+  pim:
+    ipv4:
+      local_interface: Loopback200
+  vrf: VRF200
 vxlan_interface:
   Vxlan1:
     description: dc2-leaf2b_VTEP
     vxlan:
       udp_port: 4789
-      source_interface: Loopback0
-      mlag_source_interface: Loopback1
-      virtual_router_encapsulation_mac_address: mlag-system-id
+      source_interface: Loopback1
       vlans:
       - id: 201
         vni: 20201
       - id: 202
         vni: 20202
-      - id: 211
-        vni: 20211
-      - id: 212
-        vni: 20212
       vrfs:
       - name: VRF200
         vni: 200
         multicast_group: 225.2.2.200
-      - name: VRF210
-        vni: 210
-        multicast_group: 225.2.2.210
 virtual_source_nat_vrfs:
 - name: VRF200
   ip_address: 10.255.200.5
-- name: VRF210
-  ip_address: 10.255.210.5

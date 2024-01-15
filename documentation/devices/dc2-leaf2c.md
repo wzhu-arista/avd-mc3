@@ -13,7 +13,7 @@
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
-  - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
+  - [Internal VLAN Allocation Policy Device Configuration](#internal-vlan-allocation-policy-device-configuration)
 - [VLANs](#vlans)
   - [VLANs Summary](#vlans-summary)
   - [VLANs Device Configuration](#vlans-device-configuration)
@@ -76,7 +76,7 @@ interface Management0
 | -------- | -------- | -------- |
 | MGMT | - | - |
 
-#### Management API HTTP Configuration
+#### Management API HTTP Device Configuration
 
 ```eos
 !
@@ -152,7 +152,7 @@ spanning-tree mst 0 priority 32768
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-### Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Device Configuration
 
 ```eos
 !
@@ -167,8 +167,6 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 201 | VRF200_VLAN201 | - |
 | 202 | VRF200_VLAN202 | - |
-| 211 | VRF210_VLAN211 | - |
-| 212 | VRF210_VLAN212 | - |
 
 ### VLANs Device Configuration
 
@@ -179,12 +177,6 @@ vlan 201
 !
 vlan 202
    name VRF200_VLAN202
-!
-vlan 211
-   name VRF210_VLAN211
-!
-vlan 212
-   name VRF210_VLAN212
 ```
 
 ## Interfaces
@@ -197,8 +189,8 @@ vlan 212
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet1 | DC2-LEAF2A_Ethernet4 | *trunk | *201-202,211-212 | *- | *- | 1 |
-| Ethernet2 | DC2-LEAF2B_Ethernet4 | *trunk | *201-202,211-212 | *- | *- | 1 |
+| Ethernet1 | DC2-LEAF2A_Ethernet4 | *trunk | *201-202 | *- | *- | 1 |
+| Ethernet2 | DC2-LEAF2B_Ethernet4 | *trunk | *201-202 | *- | *- | 1 |
 | Ethernet3 |  dc2-server2_eth3 | access | 11 | - | - | - |
 
 *Inherited from Port-Channel Interface
@@ -234,17 +226,17 @@ interface Ethernet3
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel1 | DC2_L3_LEAF2_Po4 | switched | trunk | 201-202,211-212 | - | - | - | - | - | - |
+| Port-Channel1 | DC2-LEAF2A_Po4 | switched | trunk | 201-202 | - | - | - | - | - | - |
 
 #### Port-Channel Interfaces Device Configuration
 
 ```eos
 !
 interface Port-Channel1
-   description DC2_L3_LEAF2_Po4
+   description DC2-LEAF2A_Po4
    no shutdown
    switchport
-   switchport trunk allowed vlan 201-202,211-212
+   switchport trunk allowed vlan 201-202
    switchport mode trunk
 ```
 
@@ -287,8 +279,8 @@ no ip routing vrf MGMT
 
 #### Static Routes Summary
 
-| VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
-| --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
+| VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
+| --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 192.168.124.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration

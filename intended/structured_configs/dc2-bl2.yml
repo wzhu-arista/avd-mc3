@@ -1,7 +1,9 @@
 hostname: dc2-bl2
+metadata:
+  platform: vEOS-lab
 is_deployed: true
 router_bgp:
-  as: '65204'
+  as: '65205'
   router_id: 10.255.2.7
   bgp:
     default:
@@ -58,6 +60,7 @@ router_bgp:
     peer: dc1-bl2
     description: dc1-bl2
     peer_group: IPv4-UNDERLAY-PEERS
+    local_as: '65204'
   address_family_evpn:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
@@ -85,24 +88,12 @@ router_bgp:
     neighbors:
     - ip_address: 10.0.0.2
       peer_group: DCI-VRF200
-      remote_as: '65103'
+      remote_as: '65105'
       description: dc1-bl2-vrf100
       send_community: standard
-  - name: VRF210
-    router_id: 10.255.2.7
-    rd: 10.255.2.7:210
-    route_targets:
-      import:
-      - address_family: evpn
-        route_targets:
-        - 210:210
-      export:
-      - address_family: evpn
-        route_targets:
-        - 210:210
-    redistribute_routes:
-    - source_protocol: connected
-    evpn_multicast: true
+    evpn_multicast_address_family:
+      ipv4:
+        transit: true
   vlan_aware_bundles:
   - name: VRF200
     rd: 10.255.2.7:21200
@@ -112,14 +103,6 @@ router_bgp:
     redistribute_routes:
     - learned
     vlan: 201-202
-  - name: VRF210
-    rd: 10.255.2.7:21210
-    route_targets:
-      both:
-      - 21210:21210
-    redistribute_routes:
-    - learned
-    vlan: 211-212
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -132,9 +115,6 @@ router_multicast:
     software_forwarding: sfe
   vrfs:
   - name: VRF200
-    ipv4:
-      routing: true
-  - name: VRF210
     ipv4:
       routing: true
 vlan_internal_order:
@@ -160,9 +140,6 @@ vrfs:
 - name: MGMT
   ip_routing: false
 - name: VRF200
-  tenant: TENANT2
-  ip_routing: true
-- name: VRF210
   tenant: TENANT2
   ip_routing: true
 management_interfaces:
@@ -220,6 +197,9 @@ ethernet_interfaces:
   type: l3dot1q
   encapsulation_dot1q_vlan: 122
   vrf: VRF200
+  pim:
+    ipv4:
+      sparse_mode: true
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
@@ -234,11 +214,6 @@ loopback_interfaces:
   shutdown: false
   vrf: VRF200
   ip_address: 10.255.200.7/32
-- name: Loopback210
-  description: VRF210_VTEP_DIAGNOSTICS
-  shutdown: false
-  vrf: VRF210
-  ip_address: 10.255.210.7/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -268,12 +243,6 @@ vlans:
 - id: 202
   name: VRF200_VLAN202
   tenant: TENANT2
-- id: 211
-  name: VRF210_VLAN211
-  tenant: TENANT2
-- id: 212
-  name: VRF210_VLAN212
-  tenant: TENANT2
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:00:99
@@ -302,30 +271,6 @@ vlan_interfaces:
     ipv4:
       local_interface: Loopback200
   vrf: VRF200
-- name: Vlan211
-  tenant: TENANT2
-  tags:
-  - VRF210_VLANS
-  description: VRF210_VLAN211
-  shutdown: false
-  ip_address_virtual: 10.10.211.1/24
-  ip_igmp: true
-  pim:
-    ipv4:
-      local_interface: Loopback210
-  vrf: VRF210
-- name: Vlan212
-  tenant: TENANT2
-  tags:
-  - VRF210_VLANS
-  description: VRF210_VLAN212
-  shutdown: false
-  ip_address_virtual: 10.10.212.1/24
-  ip_igmp: true
-  pim:
-    ipv4:
-      local_interface: Loopback210
-  vrf: VRF210
 vxlan_interface:
   Vxlan1:
     description: dc2-bl2_VTEP
@@ -337,19 +282,16 @@ vxlan_interface:
         vni: 20201
       - id: 202
         vni: 20202
-      - id: 211
-        vni: 20211
-      - id: 212
-        vni: 20212
       vrfs:
       - name: VRF200
         vni: 200
         multicast_group: 225.2.2.200
-      - name: VRF210
-        vni: 210
-        multicast_group: 225.2.2.210
 virtual_source_nat_vrfs:
 - name: VRF200
   ip_address: 10.255.200.7
-- name: VRF210
-  ip_address: 10.255.210.7
+router_pim_sparse_mode:
+  vrfs:
+  - name: VRF200
+    ipv4:
+      rp_addresses:
+      - address: 12.12.12.12

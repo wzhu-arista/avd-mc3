@@ -53,7 +53,6 @@
 | l3leaf | dc1-leaf1 | Ethernet2 | spine | dc1-spine2 | Ethernet1 |
 | l3leaf | dc1-leaf2a | Ethernet1 | spine | dc1-spine1 | Ethernet2 |
 | l3leaf | dc1-leaf2a | Ethernet2 | spine | dc1-spine2 | Ethernet2 |
-| l3leaf | dc1-leaf2a | Ethernet3 | mlag_peer | dc1-leaf2b | Ethernet3 |
 | l3leaf | dc1-leaf2a | Ethernet4 | l2leaf | dc1-leaf2c | Ethernet1 |
 | l3leaf | dc1-leaf2b | Ethernet1 | spine | dc1-spine1 | Ethernet3 |
 | l3leaf | dc1-leaf2b | Ethernet2 | spine | dc1-spine2 | Ethernet3 |
@@ -66,7 +65,6 @@
 | l3leaf | dc2-leaf1 | Ethernet2 | spine | dc2-spine2 | Ethernet1 |
 | l3leaf | dc2-leaf2a | Ethernet1 | spine | dc2-spine1 | Ethernet2 |
 | l3leaf | dc2-leaf2a | Ethernet2 | spine | dc2-spine2 | Ethernet2 |
-| l3leaf | dc2-leaf2a | Ethernet3 | mlag_peer | dc2-leaf2b | Ethernet3 |
 | l3leaf | dc2-leaf2a | Ethernet4 | l2leaf | dc2-leaf2c | Ethernet1 |
 | l3leaf | dc2-leaf2b | Ethernet1 | spine | dc2-spine1 | Ethernet3 |
 | l3leaf | dc2-leaf2b | Ethernet2 | spine | dc2-spine2 | Ethernet3 |
@@ -149,9 +147,9 @@
 | FABRIC | dc1-bl2 | 10.255.1.23/32 |
 | FABRIC | dc1-leaf1 | 10.255.1.19/32 |
 | FABRIC | dc1-leaf2a | 10.255.1.20/32 |
-| FABRIC | dc1-leaf2b | 10.255.1.20/32 |
+| FABRIC | dc1-leaf2b | 10.255.1.21/32 |
 | FABRIC | dc2-bl1 | 10.255.2.22/32 |
 | FABRIC | dc2-bl2 | 10.255.2.23/32 |
 | FABRIC | dc2-leaf1 | 10.255.2.19/32 |
 | FABRIC | dc2-leaf2a | 10.255.2.20/32 |
-| FABRIC | dc2-leaf2b | 10.255.2.20/32 |
+| FABRIC | dc2-leaf2b | 10.255.2.21/32 |

@@ -1,7 +1,9 @@
 hostname: dc1-bl1
+metadata:
+  platform: vEOS-lab
 is_deployed: true
 router_bgp:
-  as: '65103'
+  as: '65104'
   router_id: 10.255.1.6
   bgp:
     default:
@@ -58,6 +60,7 @@ router_bgp:
     peer: dc2-bl1
     description: dc2-bl1
     peer_group: IPv4-UNDERLAY-PEERS
+    local_as: '65103'
   address_family_evpn:
     peer_groups:
     - name: EVPN-OVERLAY-PEERS
@@ -85,24 +88,12 @@ router_bgp:
     neighbors:
     - ip_address: 10.0.0.1
       peer_group: DCI-VRF100
-      remote_as: '65203'
+      remote_as: '65204'
       description: dc1-bl2-vrf200
       send_community: standard
-  - name: VRF110
-    router_id: 10.255.1.6
-    rd: 10.255.1.6:110
-    route_targets:
-      import:
-      - address_family: evpn
-        route_targets:
-        - 110:110
-      export:
-      - address_family: evpn
-        route_targets:
-        - 110:110
-    redistribute_routes:
-    - source_protocol: connected
-    evpn_multicast: true
+    evpn_multicast_address_family:
+      ipv4:
+        transit: true
   vlan_aware_bundles:
   - name: VRF100
     rd: 10.255.1.6:11100
@@ -112,14 +103,6 @@ router_bgp:
     redistribute_routes:
     - learned
     vlan: 101-102
-  - name: VRF110
-    rd: 10.255.1.6:11110
-    route_targets:
-      both:
-      - 11110:11110
-    redistribute_routes:
-    - learned
-    vlan: 111-112
 static_routes:
 - vrf: MGMT
   destination_address_prefix: 0.0.0.0/0
@@ -132,9 +115,6 @@ router_multicast:
     software_forwarding: sfe
   vrfs:
   - name: VRF100
-    ipv4:
-      routing: true
-  - name: VRF110
     ipv4:
       routing: true
 vlan_internal_order:
@@ -160,9 +140,6 @@ vrfs:
 - name: MGMT
   ip_routing: false
 - name: VRF100
-  tenant: TENANT1
-  ip_routing: true
-- name: VRF110
   tenant: TENANT1
   ip_routing: true
 management_interfaces:
@@ -220,6 +197,9 @@ ethernet_interfaces:
   type: l3dot1q
   encapsulation_dot1q_vlan: 121
   vrf: VRF100
+  pim:
+    ipv4:
+      sparse_mode: true
 loopback_interfaces:
 - name: Loopback0
   description: EVPN_Overlay_Peering
@@ -234,11 +214,6 @@ loopback_interfaces:
   shutdown: false
   vrf: VRF100
   ip_address: 10.255.100.6/32
-- name: Loopback110
-  description: VRF110_VTEP_DIAGNOSTICS
-  shutdown: false
-  vrf: VRF110
-  ip_address: 10.255.110.6/32
 prefix_lists:
 - name: PL-LOOPBACKS-EVPN-OVERLAY
   sequence_numbers:
@@ -268,12 +243,6 @@ vlans:
 - id: 102
   name: VRF100_VLAN102
   tenant: TENANT1
-- id: 111
-  name: VRF110_VLAN111
-  tenant: TENANT1
-- id: 112
-  name: VRF110_VLAN112
-  tenant: TENANT1
 ip_igmp_snooping:
   globally_enabled: true
 ip_virtual_router_mac_address: 00:1c:73:00:00:99
@@ -302,30 +271,6 @@ vlan_interfaces:
     ipv4:
       local_interface: Loopback100
   vrf: VRF100
-- name: Vlan111
-  tenant: TENANT1
-  tags:
-  - VRF110_VLANS
-  description: VRF110_VLAN111
-  shutdown: false
-  ip_address_virtual: 10.10.111.1/24
-  ip_igmp: true
-  pim:
-    ipv4:
-      local_interface: Loopback110
-  vrf: VRF110
-- name: Vlan112
-  tenant: TENANT1
-  tags:
-  - VRF110_VLANS
-  description: VRF110_VLAN112
-  shutdown: false
-  ip_address_virtual: 10.10.112.1/24
-  ip_igmp: true
-  pim:
-    ipv4:
-      local_interface: Loopback110
-  vrf: VRF110
 vxlan_interface:
   Vxlan1:
     description: dc1-bl1_VTEP
@@ -337,19 +282,16 @@ vxlan_interface:
         vni: 10101
       - id: 102
         vni: 10102
-      - id: 111
-        vni: 10111
-      - id: 112
-        vni: 10112
       vrfs:
       - name: VRF100
         vni: 100
         multicast_group: 225.1.2.100
-      - name: VRF110
-        vni: 110
-        multicast_group: 225.1.2.110
 virtual_source_nat_vrfs:
 - name: VRF100
   ip_address: 10.255.100.6
-- name: VRF110
-  ip_address: 10.255.110.6
+router_pim_sparse_mode:
+  vrfs:
+  - name: VRF100
+    ipv4:
+      rp_addresses:
+      - address: 12.12.12.12

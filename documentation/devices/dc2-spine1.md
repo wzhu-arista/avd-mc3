@@ -13,7 +13,7 @@
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
-  - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
+  - [Internal VLAN Allocation Policy Device Configuration](#internal-vlan-allocation-policy-device-configuration)
 - [Interfaces](#interfaces)
   - [Ethernet Interfaces](#ethernet-interfaces)
   - [Loopback Interfaces](#loopback-interfaces)
@@ -78,7 +78,7 @@ interface Management0
 | -------- | -------- | -------- |
 | MGMT | - | - |
 
-#### Management API HTTP Configuration
+#### Management API HTTP Device Configuration
 
 ```eos
 !
@@ -147,7 +147,7 @@ spanning-tree mode none
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-### Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Device Configuration
 
 ```eos
 !
@@ -238,7 +238,6 @@ interface Ethernet5
 | --------- | ----------- | --- | ------------ |
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 
-
 #### Loopback Interfaces Device Configuration
 
 ```eos
@@ -290,8 +289,8 @@ no ip routing vrf MGMT
 
 #### Static Routes Summary
 
-| VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
-| --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
+| VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
+| --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 192.168.124.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
@@ -342,14 +341,14 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 10.255.2.3 | 65201 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.4 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 10.255.2.5 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 10.255.2.6 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 10.255.2.7 | 65204 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 10.255.2.5 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 10.255.2.6 | 65204 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 10.255.2.7 | 65205 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.33 | 65201 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.2.37 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.255.2.41 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.255.2.45 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.255.2.49 | 65204 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 10.255.2.41 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 10.255.2.45 | 65204 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 10.255.2.49 | 65205 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -386,13 +385,13 @@ router bgp 65200
    neighbor 10.255.2.4 remote-as 65202
    neighbor 10.255.2.4 description dc2-leaf2a
    neighbor 10.255.2.5 peer group EVPN-OVERLAY-PEERS
-   neighbor 10.255.2.5 remote-as 65202
+   neighbor 10.255.2.5 remote-as 65203
    neighbor 10.255.2.5 description dc2-leaf2b
    neighbor 10.255.2.6 peer group EVPN-OVERLAY-PEERS
-   neighbor 10.255.2.6 remote-as 65203
+   neighbor 10.255.2.6 remote-as 65204
    neighbor 10.255.2.6 description dc2-bl1
    neighbor 10.255.2.7 peer group EVPN-OVERLAY-PEERS
-   neighbor 10.255.2.7 remote-as 65204
+   neighbor 10.255.2.7 remote-as 65205
    neighbor 10.255.2.7 description dc2-bl2
    neighbor 10.255.2.33 peer group IPv4-UNDERLAY-PEERS
    neighbor 10.255.2.33 remote-as 65201
@@ -401,13 +400,13 @@ router bgp 65200
    neighbor 10.255.2.37 remote-as 65202
    neighbor 10.255.2.37 description dc2-leaf2a_Ethernet1
    neighbor 10.255.2.41 peer group IPv4-UNDERLAY-PEERS
-   neighbor 10.255.2.41 remote-as 65202
+   neighbor 10.255.2.41 remote-as 65203
    neighbor 10.255.2.41 description dc2-leaf2b_Ethernet1
    neighbor 10.255.2.45 peer group IPv4-UNDERLAY-PEERS
-   neighbor 10.255.2.45 remote-as 65203
+   neighbor 10.255.2.45 remote-as 65204
    neighbor 10.255.2.45 description dc2-bl1_Ethernet1
    neighbor 10.255.2.49 peer group IPv4-UNDERLAY-PEERS
-   neighbor 10.255.2.49 remote-as 65204
+   neighbor 10.255.2.49 remote-as 65205
    neighbor 10.255.2.49 description dc2-bl2_Ethernet1
    redistribute connected route-map RM-CONN-2-BGP
    !
@@ -461,10 +460,9 @@ router multicast
       routing
 ```
 
-
 ### PIM Sparse Mode
 
-#### PIM Sparse Mode enabled interfaces
+#### PIM Sparse Mode Enabled Interfaces
 
 | Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
 | -------------- | -------- | ---------- | ----------- | --------------- |

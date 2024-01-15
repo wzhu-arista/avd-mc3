@@ -13,7 +13,7 @@
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
 - [Internal VLAN Allocation Policy](#internal-vlan-allocation-policy)
   - [Internal VLAN Allocation Policy Summary](#internal-vlan-allocation-policy-summary)
-  - [Internal VLAN Allocation Policy Configuration](#internal-vlan-allocation-policy-configuration)
+  - [Internal VLAN Allocation Policy Device Configuration](#internal-vlan-allocation-policy-device-configuration)
 - [VLANs](#vlans)
   - [VLANs Summary](#vlans-summary)
   - [VLANs Device Configuration](#vlans-device-configuration)
@@ -88,7 +88,7 @@ interface Management0
 | -------- | -------- | -------- |
 | MGMT | - | - |
 
-#### Management API HTTP Configuration
+#### Management API HTTP Device Configuration
 
 ```eos
 !
@@ -164,7 +164,7 @@ spanning-tree mst 0 priority 4096
 | ------------------| --------------- | ------------ |
 | ascending | 1006 | 1199 |
 
-### Internal VLAN Allocation Policy Configuration
+### Internal VLAN Allocation Policy Device Configuration
 
 ```eos
 !
@@ -179,8 +179,6 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 101 | VRF100_VLAN101 | - |
 | 102 | VRF100_VLAN102 | - |
-| 111 | VRF110_VLAN111 | - |
-| 112 | VRF110_VLAN112 | - |
 
 ### VLANs Device Configuration
 
@@ -191,12 +189,6 @@ vlan 101
 !
 vlan 102
    name VRF100_VLAN102
-!
-vlan 111
-   name VRF110_VLAN111
-!
-vlan 112
-   name VRF110_VLAN112
 ```
 
 ## Interfaces
@@ -261,6 +253,7 @@ interface Ethernet4.122
    encapsulation dot1q vlan 122
    vrf VRF100
    ip address 10.0.0.2/31
+   pim ipv4 sparse-mode
 ```
 
 ### Loopback Interfaces
@@ -274,7 +267,6 @@ interface Ethernet4.122
 | Loopback0 | EVPN_Overlay_Peering | default | 10.255.1.7/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.1.23/32 |
 | Loopback100 | VRF100_VTEP_DIAGNOSTICS | VRF100 | 10.255.100.7/32 |
-| Loopback110 | VRF110_VTEP_DIAGNOSTICS | VRF110 | 10.255.110.7/32 |
 
 ##### IPv6
 
@@ -283,8 +275,6 @@ interface Ethernet4.122
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
 | Loopback100 | VRF100_VTEP_DIAGNOSTICS | VRF100 | - |
-| Loopback110 | VRF110_VTEP_DIAGNOSTICS | VRF110 | - |
-
 
 #### Loopback Interfaces Device Configuration
 
@@ -305,12 +295,6 @@ interface Loopback100
    no shutdown
    vrf VRF100
    ip address 10.255.100.7/32
-!
-interface Loopback110
-   description VRF110_VTEP_DIAGNOSTICS
-   no shutdown
-   vrf VRF110
-   ip address 10.255.110.7/32
 ```
 
 ### VLAN Interfaces
@@ -321,8 +305,6 @@ interface Loopback110
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan101 | VRF100_VLAN101 | VRF100 | - | False |
 | Vlan102 | VRF100_VLAN102 | VRF100 | - | False |
-| Vlan111 | VRF110_VLAN111 | VRF110 | - | False |
-| Vlan112 | VRF110_VLAN112 | VRF110 | - | False |
 
 ##### IPv4
 
@@ -330,8 +312,6 @@ interface Loopback110
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
 | Vlan101 |  VRF100  |  -  |  10.10.101.1/24  |  -  |  -  |  -  |  -  |
 | Vlan102 |  VRF100  |  -  |  10.10.102.1/24  |  -  |  -  |  -  |  -  |
-| Vlan111 |  VRF110  |  -  |  10.10.111.1/24  |  -  |  -  |  -  |  -  |
-| Vlan112 |  VRF110  |  -  |  10.10.112.1/24  |  -  |  -  |  -  |  -  |
 
 #### VLAN Interfaces Device Configuration
 
@@ -352,22 +332,6 @@ interface Vlan102
    ip igmp
    pim ipv4 local-interface Loopback100
    ip address virtual 10.10.102.1/24
-!
-interface Vlan111
-   description VRF110_VLAN111
-   no shutdown
-   vrf VRF110
-   ip igmp
-   pim ipv4 local-interface Loopback110
-   ip address virtual 10.10.111.1/24
-!
-interface Vlan112
-   description VRF110_VLAN112
-   no shutdown
-   vrf VRF110
-   ip igmp
-   pim ipv4 local-interface Loopback110
-   ip address virtual 10.10.112.1/24
 ```
 
 ### VXLAN Interface
@@ -385,15 +349,12 @@ interface Vlan112
 | ---- | --- | ---------- | --------------- |
 | 101 | 10101 | - | - |
 | 102 | 10102 | - | - |
-| 111 | 10111 | - | - |
-| 112 | 10112 | - | - |
 
 ##### VRF to VNI and Multicast Group Mappings
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
 | VRF100 | 100 | 225.1.2.100 |
-| VRF110 | 110 | 225.1.2.110 |
 
 #### VXLAN Interface Device Configuration
 
@@ -405,12 +366,8 @@ interface Vxlan1
    vxlan udp-port 4789
    vxlan vlan 101 vni 10101
    vxlan vlan 102 vni 10102
-   vxlan vlan 111 vni 10111
-   vxlan vlan 112 vni 10112
    vxlan vrf VRF100 vni 100
-   vxlan vrf VRF110 vni 110
    vxlan vrf VRF100 multicast group 225.1.2.100
-   vxlan vrf VRF110 multicast group 225.1.2.110
 ```
 
 ## Routing
@@ -428,9 +385,9 @@ service routing protocols model multi-agent
 
 #### Virtual Router MAC Address Summary
 
-##### Virtual Router MAC Address: 00:1c:73:00:00:99
+Virtual Router MAC Address: 00:1c:73:00:00:99
 
-#### Virtual Router MAC Address Configuration
+#### Virtual Router MAC Address Device Configuration
 
 ```eos
 !
@@ -446,7 +403,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 | default | True |
 | MGMT | False |
 | VRF100 | True |
-| VRF110 | True |
 
 #### IP Routing Device Configuration
 
@@ -455,7 +411,6 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 ip routing
 no ip routing vrf MGMT
 ip routing vrf VRF100
-ip routing vrf VRF110
 ```
 
 ### IPv6 Routing
@@ -467,14 +422,13 @@ ip routing vrf VRF110
 | default | False |
 | MGMT | false |
 | VRF100 | false |
-| VRF110 | false |
 
 ### Static Routes
 
 #### Static Routes Summary
 
-| VRF | Destination Prefix | Next Hop IP             | Exit interface      | Administrative Distance       | Tag               | Route Name                    | Metric         |
-| --- | ------------------ | ----------------------- | ------------------- | ----------------------------- | ----------------- | ----------------------------- | -------------- |
+| VRF | Destination Prefix | Next Hop IP | Exit interface | Administrative Distance | Tag | Route Name | Metric |
+| --- | ------------------ | ----------- | -------------- | ----------------------- | --- | ---------- | ------ |
 | MGMT | 0.0.0.0/0 | 192.168.124.1 | - | 1 | - | - | - |
 
 #### Static Routes Device Configuration
@@ -490,7 +444,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65104 | 10.255.1.7 |
+| 65105 | 10.255.1.7 |
 
 | BGP Tuning |
 | ---------- |
@@ -527,7 +481,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | 10.255.1.48 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.1.50 | 65100 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 172.100.100.3 | 65204 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.0.0.3 | 65203 | VRF100 | - | standard | - | - | - | - | - | - |
+| 10.0.0.3 | 65205 | VRF100 | - | standard | - | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -542,20 +496,18 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | VLAN Aware Bundle | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute | VLANs |
 | ----------------- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ | ----- |
 | VRF100 | 10.255.1.7:11100 | 11100:11100 | - | - | learned | 101-102 |
-| VRF110 | 10.255.1.7:11110 | 11110:11110 | - | - | learned | 111-112 |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute | EVPN Multicast |
 | --- | ------------------- | ------------ | -------------- |
-| VRF100 | 10.255.1.7:100 | connected | IPv4: True<br>Transit: False |
-| VRF110 | 10.255.1.7:110 | connected | IPv4: True<br>Transit: False |
+| VRF100 | 10.255.1.7:100 | connected | IPv4: True<br>Transit: True |
 
 #### Router BGP Device Configuration
 
 ```eos
 !
-router bgp 65104
+router bgp 65105
    router-id 10.255.1.7
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -584,6 +536,7 @@ router bgp 65104
    neighbor 10.255.1.50 description dc1-spine2_Ethernet5
    neighbor 172.100.100.3 peer group IPv4-UNDERLAY-PEERS
    neighbor 172.100.100.3 remote-as 65204
+   neighbor 172.100.100.3 local-as 65104 no-prepend replace-as
    neighbor 172.100.100.3 description dc2-bl2
    redistribute connected route-map RM-CONN-2-BGP
    !
@@ -592,12 +545,6 @@ router bgp 65104
       route-target both 11100:11100
       redistribute learned
       vlan 101-102
-   !
-   vlan-aware-bundle VRF110
-      rd 10.255.1.7:11110
-      route-target both 11110:11110
-      redistribute learned
-      vlan 111-112
    !
    address-family evpn
       neighbor EVPN-OVERLAY-PEERS activate
@@ -609,10 +556,12 @@ router bgp 65104
    vrf VRF100
       rd 10.255.1.7:100
       evpn multicast
+         address-family ipv4
+            transit
       route-target import evpn 100:100
       route-target export evpn 100:100
       router-id 10.255.1.7
-      neighbor 10.0.0.3 remote-as 65203
+      neighbor 10.0.0.3 remote-as 65205
       neighbor 10.0.0.3 peer group DCI-VRF100
       neighbor 10.0.0.3 description dc2-bl2-vrf200
       neighbor 10.0.0.3 send-community standard
@@ -620,14 +569,6 @@ router bgp 65104
       !
       address-family ipv4
          neighbor 10.0.0.3 activate
-   !
-   vrf VRF110
-      rd 10.255.1.7:110
-      evpn multicast
-      route-target import evpn 110:110
-      route-target export evpn 110:110
-      router-id 10.255.1.7
-      redistribute connected
 ```
 
 ## BFD
@@ -682,7 +623,6 @@ router bfd
 | VRF Name | Multicast Routing |
 | -------- | ----------------- |
 | VRF100 | enabled |
-| VRF110 | enabled |
 
 #### Router Multicast Device Configuration
 
@@ -696,21 +636,42 @@ router multicast
    vrf VRF100
       ipv4
          routing
-   !
-   vrf VRF110
-      ipv4
-         routing
 ```
-
 
 ### PIM Sparse Mode
 
-#### PIM Sparse Mode enabled interfaces
+#### Router PIM Sparse Mode
+
+##### IP Sparse Mode Information
+
+##### IP Sparse Mode VRFs
+
+| VRF Name | BFD Enabled |
+| -------- | ----------- |
+| VRF100 | False |
+
+| VRF Name | Rendezvous Point Address | Group Address | Access Lists | Priority | Hashmask | Override |
+| -------- | ------------------------ | ------------- | ------------ | -------- | -------- | -------- |
+| VRF100 | 12.12.12.12 | - | - | - | - | - |
+
+##### Router Multicast Device Configuration
+
+```eos
+!
+router pim sparse-mode
+   !
+   vrf VRF100
+      ipv4
+         rp address 12.12.12.12
+```
+
+#### PIM Sparse Mode Enabled Interfaces
 
 | Interface Name | VRF Name | IP Version | DR Priority | Local Interface |
 | -------------- | -------- | ---------- | ----------- | --------------- |
 | Ethernet1 | - | IPv4 | - | - |
 | Ethernet2 | - | IPv4 | - | - |
+| Ethernet4.122 | VRF100 | IPv4 | - | - |
 
 ## Filters
 
@@ -760,7 +721,6 @@ route-map RM-CONN-2-BGP permit 10
 | -------- | ---------- |
 | MGMT | disabled |
 | VRF100 | enabled |
-| VRF110 | enabled |
 
 ### VRF Instances Device Configuration
 
@@ -769,8 +729,6 @@ route-map RM-CONN-2-BGP permit 10
 vrf instance MGMT
 !
 vrf instance VRF100
-!
-vrf instance VRF110
 ```
 
 ## Virtual Source NAT
@@ -780,12 +738,10 @@ vrf instance VRF110
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
 | VRF100 | 10.255.100.7 |
-| VRF110 | 10.255.110.7 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
 ip address virtual source-nat vrf VRF100 address 10.255.100.7
-ip address virtual source-nat vrf VRF110 address 10.255.110.7
 ```

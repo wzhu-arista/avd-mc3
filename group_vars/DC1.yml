@@ -81,16 +81,19 @@ l3leaf:
       filter:
         tenants: [TENANT1]
         tags: [all]
-      bgp_as: 65102
+      mlag: false
+      # bgp_as: 65102
       nodes: 
         - name: dc1-leaf2a
           id: 2
+          bgp_as: 65102
           mgmt_ip: 192.168.124.105/24
           uplink_switch_interfaces:
             - Ethernet2
             - Ethernet2 
         - name: dc1-leaf2b
           id: 3
+          bgp_as: 65103
           mgmt_ip: 192.168.124.106/24
           uplink_switch_interfaces:
             - Ethernet3
@@ -98,7 +101,7 @@ l3leaf:
     - group: DC1_L3_BL
       filter:
         tenants: [TENANT1]
-      # bgp_as: 65103
+      # bgp_as: 65104
       mlag: false
       # evpn_gateway:
       #   # Specific BGP EVPN Gateway functionality for route types 2 (MAC-IP), 3 (IMET) and 5 (IP-PREFIX) can be enabled separately as needed.
@@ -110,7 +113,7 @@ l3leaf:
       nodes: 
         - name: dc1-bl1
           id: 4
-          bgp_as: 65103
+          bgp_as: 65104
           mgmt_ip: 192.168.124.109/24
           uplink_switch_interfaces:
             - Ethernet4
@@ -121,7 +124,7 @@ l3leaf:
           #     - hostname: dc2-leaf2a     
         - name: dc1-bl2
           id: 5
-          bgp_as: 65104
+          bgp_as: 65105
           mgmt_ip: 192.168.124.110/24
           uplink_switch_interfaces:
             - Ethernet5
