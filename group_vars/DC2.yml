@@ -82,6 +82,8 @@ l3leaf:
         tenants: [TENANT2]
         tags: [all]
       mlag: false
+      lacp_port_id_range: 
+        enabled: True      
       # bgp_as: 65202
       nodes: 
         - name: dc2-leaf2a
@@ -103,6 +105,8 @@ l3leaf:
         tenants: [TENANT2]
       # bgp_as: 65204
       mlag: false
+      lacp_port_id_range: 
+        enabled: True      
       # evpn_gateway:
       #   # Specific BGP EVPN Gateway functionality for route types 2 (MAC-IP), 3 (IMET) and 5 (IP-PREFIX) can be enabled separately as needed.
       #   evpn_l2:

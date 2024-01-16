@@ -8,6 +8,9 @@
 - [Authentication](#authentication)
   - [Local Users](#local-users)
   - [AAA Authorization](#aaa-authorization)
+- [LACP](#lacp)
+  - [LACP Summary](#lacp-summary)
+  - [LACP Device Configuration](#lacp-device-configuration)
 - [Spanning Tree](#spanning-tree)
   - [Spanning Tree Summary](#spanning-tree-summary)
   - [Spanning Tree Device Configuration](#spanning-tree-device-configuration)
@@ -134,6 +137,21 @@ Authorization for configuration commands is disabled.
 ```eos
 aaa authorization exec default local
 !
+```
+
+## LACP
+
+### LACP Summary
+
+| Port-id range | Rate-limit default | System-priority |
+| ------------- | ------------------ | --------------- |
+| 129 - 256 | - | - |
+
+### LACP Device Configuration
+
+```eos
+!
+lacp port-id range 129 256
 ```
 
 ## Spanning Tree
