@@ -341,12 +341,12 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | -------- | --------- | --- | -------- | -------------- | -------------- | ---------- | --- | --------------------- | ---------------------- | ------- |
 | 10.255.2.3 | 65201 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.4 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
-| 10.255.2.5 | 65202 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
+| 10.255.2.5 | 65203 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.6 | 65204 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.7 | 65205 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.33 | 65201 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.2.37 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.255.2.41 | 65202 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
+| 10.255.2.41 | 65203 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.2.45 | 65204 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.2.49 | 65205 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 
@@ -385,7 +385,7 @@ router bgp 65200
    neighbor 10.255.2.4 remote-as 65202
    neighbor 10.255.2.4 description dc2-leaf2a
    neighbor 10.255.2.5 peer group EVPN-OVERLAY-PEERS
-   neighbor 10.255.2.5 remote-as 65202
+   neighbor 10.255.2.5 remote-as 65203
    neighbor 10.255.2.5 description dc2-leaf2b
    neighbor 10.255.2.6 peer group EVPN-OVERLAY-PEERS
    neighbor 10.255.2.6 remote-as 65204
@@ -400,7 +400,7 @@ router bgp 65200
    neighbor 10.255.2.37 remote-as 65202
    neighbor 10.255.2.37 description dc2-leaf2a_Ethernet1
    neighbor 10.255.2.41 peer group IPv4-UNDERLAY-PEERS
-   neighbor 10.255.2.41 remote-as 65202
+   neighbor 10.255.2.41 remote-as 65203
    neighbor 10.255.2.41 description dc2-leaf2b_Ethernet1
    neighbor 10.255.2.45 peer group IPv4-UNDERLAY-PEERS
    neighbor 10.255.2.45 remote-as 65204

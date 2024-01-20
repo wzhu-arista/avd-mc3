@@ -8,9 +8,6 @@
 - [Authentication](#authentication)
   - [Local Users](#local-users)
   - [AAA Authorization](#aaa-authorization)
-- [MLAG](#mlag)
-  - [MLAG Summary](#mlag-summary)
-  - [MLAG Device Configuration](#mlag-device-configuration)
 - [LACP](#lacp)
   - [LACP Summary](#lacp-summary)
   - [LACP Device Configuration](#lacp-device-configuration)
@@ -143,29 +140,6 @@ aaa authorization exec default local
 !
 ```
 
-## MLAG
-
-### MLAG Summary
-
-| Domain-id | Local-interface | Peer-address | Peer-link |
-| --------- | --------------- | ------------ | --------- |
-| DC2_L3_LEAF2 | Vlan4094 | 10.255.2.66 | Port-Channel3 |
-
-Dual primary detection is disabled.
-
-### MLAG Device Configuration
-
-```eos
-!
-mlag configuration
-   domain-id DC2_L3_LEAF2
-   local-interface Vlan4094
-   peer-address 10.255.2.66
-   peer-link Port-Channel3
-   reload-delay mlag 300
-   reload-delay non-mlag 330
-```
-
 ## LACP
 
 ### LACP Summary
@@ -193,16 +167,11 @@ STP mode: **mstp**
 | -------- | -------- |
 | 0 | 4096 |
 
-#### Global Spanning-Tree Settings
-
-- Spanning Tree disabled for VLANs: **4093-4094**
-
 ### Spanning Tree Device Configuration
 
 ```eos
 !
 spanning-tree mode mstp
-no spanning-tree vlan-id 4093-4094
 spanning-tree mst 0 priority 4096
 ```
 
@@ -229,9 +198,6 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 201 | VRF200_VLAN201 | - |
 | 202 | VRF200_VLAN202 | - |
-| 3199 | MLAG_iBGP_VRF200 | LEAF_PEER_L3 |
-| 4093 | LEAF_PEER_L3 | LEAF_PEER_L3 |
-| 4094 | MLAG_PEER | MLAG |
 
 ### VLANs Device Configuration
 
@@ -242,18 +208,6 @@ vlan 201
 !
 vlan 202
    name VRF200_VLAN202
-!
-vlan 3199
-   name MLAG_iBGP_VRF200
-   trunk group LEAF_PEER_L3
-!
-vlan 4093
-   name LEAF_PEER_L3
-   trunk group LEAF_PEER_L3
-!
-vlan 4094
-   name MLAG_PEER
-   trunk group MLAG
 ```
 
 ## Interfaces
@@ -266,7 +220,6 @@ vlan 4094
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet3 | MLAG_PEER_dc2-leaf2a_Ethernet3 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 3 |
 | Ethernet4 | DC2-LEAF2C_Ethernet2 | *trunk | *201-202 | *- | *- | 4 |
 | Ethernet5 | dc2-server2_eth2 | *trunk | *201-202,211-212 | *4092 | *- | 5 |
 
@@ -299,11 +252,6 @@ interface Ethernet2
    ip address 10.255.2.43/31
    pim ipv4 sparse-mode
 !
-interface Ethernet3
-   description MLAG_PEER_dc2-leaf2a_Ethernet3
-   no shutdown
-   channel-group 3 mode active
-!
 interface Ethernet4
    description DC2-LEAF2C_Ethernet2
    no shutdown
@@ -323,21 +271,12 @@ interface Ethernet5
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel3 | MLAG_PEER_dc2-leaf2a_Po3 | switched | trunk | - | - | ['LEAF_PEER_L3', 'MLAG'] | - | - | - | - |
-| Port-Channel4 | DC2-LEAF2C_Po1 | switched | trunk | 201-202 | - | - | - | - | 4 | - |
-| Port-Channel5 | dc2-server2_PortChannel dc2-server2 | switched | trunk | 201-202,211-212 | 4092 | - | - | - | 5 | - |
+| Port-Channel4 | DC2-LEAF2C_Po1 | switched | trunk | 201-202 | - | - | - | - | - | - |
+| Port-Channel5 | dc2-server2_PortChannel dc2-server2 | switched | trunk | 201-202,211-212 | 4092 | - | - | - | - | - |
 
 #### Port-Channel Interfaces Device Configuration
 
 ```eos
-!
-interface Port-Channel3
-   description MLAG_PEER_dc2-leaf2a_Po3
-   no shutdown
-   switchport
-   switchport mode trunk
-   switchport trunk group LEAF_PEER_L3
-   switchport trunk group MLAG
 !
 interface Port-Channel4
    description DC2-LEAF2C_Po1
@@ -345,7 +284,6 @@ interface Port-Channel4
    switchport
    switchport trunk allowed vlan 201-202
    switchport mode trunk
-   mlag 4
 !
 interface Port-Channel5
    description dc2-server2_PortChannel dc2-server2
@@ -354,7 +292,6 @@ interface Port-Channel5
    switchport trunk allowed vlan 201-202,211-212
    switchport trunk native vlan 4092
    switchport mode trunk
-   mlag 5
    spanning-tree portfast
 ```
 
@@ -367,7 +304,7 @@ interface Port-Channel5
 | Interface | Description | VRF | IP Address |
 | --------- | ----------- | --- | ---------- |
 | Loopback0 | EVPN_Overlay_Peering | default | 10.255.2.5/32 |
-| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.2.20/32 |
+| Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.2.21/32 |
 | Loopback200 | VRF200_VTEP_DIAGNOSTICS | VRF200 | 10.255.200.5/32 |
 
 ##### IPv6
@@ -390,7 +327,7 @@ interface Loopback0
 interface Loopback1
    description VTEP_VXLAN_Tunnel_Source
    no shutdown
-   ip address 10.255.2.20/32
+   ip address 10.255.2.21/32
 !
 interface Loopback200
    description VRF200_VTEP_DIAGNOSTICS
@@ -407,9 +344,6 @@ interface Loopback200
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan201 | VRF200_VLAN201 | VRF200 | - | False |
 | Vlan202 | VRF200_VLAN202 | VRF200 | - | False |
-| Vlan3199 | MLAG_PEER_L3_iBGP: vrf VRF200 | VRF200 | 1500 | False |
-| Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
-| Vlan4094 | MLAG_PEER | default | 1500 | False |
 
 ##### IPv4
 
@@ -417,9 +351,6 @@ interface Loopback200
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
 | Vlan201 |  VRF200  |  -  |  10.10.201.1/24  |  -  |  -  |  -  |  -  |
 | Vlan202 |  VRF200  |  -  |  10.10.202.1/24  |  -  |  -  |  -  |  -  |
-| Vlan3199 |  VRF200  |  10.255.2.99/31  |  -  |  -  |  -  |  -  |  -  |
-| Vlan4093 |  default  |  10.255.2.99/31  |  -  |  -  |  -  |  -  |  -  |
-| Vlan4094 |  default  |  10.255.2.67/31  |  -  |  -  |  -  |  -  |  -  |
 
 #### VLAN Interfaces Device Configuration
 
@@ -429,7 +360,7 @@ interface Vlan201
    description VRF200_VLAN201
    no shutdown
    vrf VRF200
-   pim ipv4 sparse-mode
+   ip igmp
    pim ipv4 local-interface Loopback200
    ip address virtual 10.10.201.1/24
 !
@@ -437,30 +368,9 @@ interface Vlan202
    description VRF200_VLAN202
    no shutdown
    vrf VRF200
-   pim ipv4 sparse-mode
+   ip igmp
    pim ipv4 local-interface Loopback200
    ip address virtual 10.10.202.1/24
-!
-interface Vlan3199
-   description MLAG_PEER_L3_iBGP: vrf VRF200
-   no shutdown
-   mtu 1500
-   vrf VRF200
-   ip address 10.255.2.99/31
-!
-interface Vlan4093
-   description MLAG_PEER_L3_PEERING
-   no shutdown
-   mtu 1500
-   ip address 10.255.2.99/31
-   pim ipv4 sparse-mode
-!
-interface Vlan4094
-   description MLAG_PEER
-   no shutdown
-   mtu 1500
-   no autostate
-   ip address 10.255.2.67/31
 ```
 
 ### VXLAN Interface
@@ -469,10 +379,8 @@ interface Vlan4094
 
 | Setting | Value |
 | ------- | ----- |
-| Source Interface | Loopback0 |
-| MLAG Source Interface | Loopback1 |
+| Source Interface | Loopback1 |
 | UDP port | 4789 |
-| EVPN MLAG Shared Router MAC | mlag-system-id |
 
 ##### VLAN to VNI, Flood List and Multicast Group Mappings
 
@@ -493,13 +401,11 @@ interface Vlan4094
 !
 interface Vxlan1
    description dc2-leaf2b_VTEP
-   vxlan source-interface Loopback0
-   vxlan virtual-router encapsulation mac-address mlag-system-id
+   vxlan source-interface Loopback1
    vxlan udp-port 4789
    vxlan vlan 201 vni 20201
    vxlan vlan 202 vni 20202
    vxlan vrf VRF200 vni 200
-   vxlan mlag source-interface Loopback1
    vxlan vrf VRF200 multicast group 225.2.2.200
 ```
 
@@ -577,7 +483,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 
 | BGP AS | Router ID |
 | ------ | --------- |
-| 65202 | 10.255.2.5 |
+| 65203 | 10.255.2.5 |
 
 | BGP Tuning |
 | ---------- |
@@ -605,16 +511,6 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | Send community | all |
 | Maximum routes | 12000 |
 
-##### MLAG-IPv4-UNDERLAY-PEER
-
-| Settings | Value |
-| -------- | ----- |
-| Address Family | ipv4 |
-| Remote AS | 65202 |
-| Next-hop self | True |
-| Send community | all |
-| Maximum routes | 12000 |
-
 #### BGP Neighbors
 
 | Neighbor | Remote AS | VRF | Shutdown | Send-community | Maximum-routes | Allowas-in | BFD | RIB Pre-Policy Retain | Route-Reflector Client | Passive |
@@ -623,8 +519,6 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | 10.255.2.2 | 65200 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - |
 | 10.255.2.40 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
 | 10.255.2.42 | 65200 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - |
-| 10.255.2.98 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | default | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
-| 10.255.2.98 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF200 | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
 
@@ -650,7 +544,7 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 
 ```eos
 !
-router bgp 65202
+router bgp 65203
    router-id 10.255.2.5
    maximum-paths 4 ecmp 4
    no bgp default ipv4-unicast
@@ -665,14 +559,6 @@ router bgp 65202
    neighbor IPv4-UNDERLAY-PEERS password 7 <removed>
    neighbor IPv4-UNDERLAY-PEERS send-community
    neighbor IPv4-UNDERLAY-PEERS maximum-routes 12000
-   neighbor MLAG-IPv4-UNDERLAY-PEER peer group
-   neighbor MLAG-IPv4-UNDERLAY-PEER remote-as 65202
-   neighbor MLAG-IPv4-UNDERLAY-PEER next-hop-self
-   neighbor MLAG-IPv4-UNDERLAY-PEER description dc2-leaf2a
-   neighbor MLAG-IPv4-UNDERLAY-PEER password 7 <removed>
-   neighbor MLAG-IPv4-UNDERLAY-PEER send-community
-   neighbor MLAG-IPv4-UNDERLAY-PEER maximum-routes 12000
-   neighbor MLAG-IPv4-UNDERLAY-PEER route-map RM-MLAG-PEER-IN in
    neighbor 10.255.2.1 peer group EVPN-OVERLAY-PEERS
    neighbor 10.255.2.1 remote-as 65200
    neighbor 10.255.2.1 description dc2-spine1
@@ -685,8 +571,6 @@ router bgp 65202
    neighbor 10.255.2.42 peer group IPv4-UNDERLAY-PEERS
    neighbor 10.255.2.42 remote-as 65200
    neighbor 10.255.2.42 description dc2-spine2_Ethernet3
-   neighbor 10.255.2.98 peer group MLAG-IPv4-UNDERLAY-PEER
-   neighbor 10.255.2.98 description dc2-leaf2a
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan-aware-bundle VRF200
@@ -701,7 +585,6 @@ router bgp 65202
    address-family ipv4
       no neighbor EVPN-OVERLAY-PEERS activate
       neighbor IPv4-UNDERLAY-PEERS activate
-      neighbor MLAG-IPv4-UNDERLAY-PEER activate
    !
    vrf VRF200
       rd 10.255.2.5:200
@@ -709,7 +592,6 @@ router bgp 65202
       route-target import evpn 200:200
       route-target export evpn 200:200
       router-id 10.255.2.5
-      neighbor 10.255.2.98 peer group MLAG-IPv4-UNDERLAY-PEER
       redistribute connected
 ```
 
@@ -788,9 +670,6 @@ router multicast
 | -------------- | -------- | ---------- | ----------- | --------------- |
 | Ethernet1 | - | IPv4 | - | - |
 | Ethernet2 | - | IPv4 | - | - |
-| Vlan201 | VRF200 | IPv4 | - | Loopback200 |
-| Vlan202 | VRF200 | IPv4 | - | Loopback200 |
-| Vlan4093 | - | IPv4 | - | - |
 
 ## Filters
 
@@ -824,22 +703,12 @@ ip prefix-list PL-LOOPBACKS-EVPN-OVERLAY
 | -------- | ---- | ----- | --- | ------------- | -------- |
 | 10 | permit | ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY | - | - | - |
 
-##### RM-MLAG-PEER-IN
-
-| Sequence | Type | Match | Set | Sub-Route-Map | Continue |
-| -------- | ---- | ----- | --- | ------------- | -------- |
-| 10 | permit | - | origin incomplete | - | - |
-
 #### Route-maps Device Configuration
 
 ```eos
 !
 route-map RM-CONN-2-BGP permit 10
    match ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
-!
-route-map RM-MLAG-PEER-IN permit 10
-   description Make routes learned over MLAG Peer-link less preferred on spines to ensure optimal routing
-   set origin incomplete
 ```
 
 ## VRF Instances

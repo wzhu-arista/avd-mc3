@@ -81,21 +81,21 @@ l3leaf:
       filter:
         tenants: [TENANT2]
         tags: [all]
-      # mlag: false
+      mlag: false
       lacp_port_id_range: 
         enabled: True      
-      bgp_as: 65202
+      # bgp_as: 65202
       nodes: 
         - name: dc2-leaf2a
           id: 2
-          # bgp_as: 65202
+          bgp_as: 65202
           mgmt_ip: 192.168.124.115/24
           uplink_switch_interfaces:
             - Ethernet2
             - Ethernet2 
         - name: dc2-leaf2b
           id: 3
-          # bgp_as: 65203
+          bgp_as: 65203
           mgmt_ip: 192.168.124.116/24
           uplink_switch_interfaces:
             - Ethernet3
