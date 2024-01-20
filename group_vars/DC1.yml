@@ -77,6 +77,13 @@ l3leaf:
           uplink_switch_interfaces:
             - Ethernet1
             - Ethernet1
+          # structured_config:
+          #   vxlan_interface:
+          #     Vxlan1:
+          #       vxlan:
+          #         vrfs:
+          #         - name: VRF100
+          #           multicast_group: 225.1.2.100
     - group: DC1_L3_LEAF2
       filter:
         tenants: [TENANT1]

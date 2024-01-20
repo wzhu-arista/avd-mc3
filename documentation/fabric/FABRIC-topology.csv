@@ -46,12 +46,14 @@ l3leaf,dc2-leaf1,Ethernet2,spine,dc2-spine2,Ethernet1,True
 l3leaf,dc2-leaf1,Ethernet3,server,dc2-Server1,eth1,True
 l3leaf,dc2-leaf2a,Ethernet1,spine,dc2-spine1,Ethernet2,True
 l3leaf,dc2-leaf2a,Ethernet2,spine,dc2-spine2,Ethernet2,True
+l3leaf,dc2-leaf2a,Ethernet3,mlag_peer,dc2-leaf2b,Ethernet3,True
 l3leaf,dc2-leaf2a,Ethernet4,l2leaf,dc2-leaf2c,Ethernet1,True
 l3leaf,dc2-leaf2a,Ethernet5,server,dc2-server2,eth1,True
 l3leaf,dc2-leaf2a,Ethernet6,l3_interface,,,True
 l3leaf,dc2-leaf2a,Ethernet6.200,l3_interface,,,True
 l3leaf,dc2-leaf2b,Ethernet1,spine,dc2-spine1,Ethernet3,True
 l3leaf,dc2-leaf2b,Ethernet2,spine,dc2-spine2,Ethernet3,True
+l3leaf,dc2-leaf2b,Ethernet3,mlag_peer,dc2-leaf2a,Ethernet3,True
 l3leaf,dc2-leaf2b,Ethernet4,l2leaf,dc2-leaf2c,Ethernet2,True
 l3leaf,dc2-leaf2b,Ethernet5,server,dc2-server2,eth2,True
 l2leaf,dc2-leaf2c,Ethernet1,l3leaf,dc2-leaf2a,Ethernet4,True

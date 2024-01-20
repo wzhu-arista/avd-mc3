@@ -146,7 +146,7 @@ tenants:
     vrfs:
       # VRF definitions inside the tenant.
       - name: VRF200
-        # VRF VNI definition.
+        # VRF VNI definition
         vrf_vni: 200
         # Enable VTEP Network diagnostics
         # This will create a loopback with virtual source-nat enable to perform diagnostics from the switch.
