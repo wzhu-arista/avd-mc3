@@ -226,14 +226,14 @@ interface Ethernet3
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel1 | DC2-LEAF2A_Po4 | switched | trunk | 201-202 | - | - | - | - | - | - |
+| Port-Channel1 | DC2_L3_LEAF2_Po4 | switched | trunk | 201-202 | - | - | - | - | - | - |
 
 #### Port-Channel Interfaces Device Configuration
 
 ```eos
 !
 interface Port-Channel1
-   description DC2-LEAF2A_Po4
+   description DC2_L3_LEAF2_Po4
    no shutdown
    switchport
    switchport trunk allowed vlan 201-202

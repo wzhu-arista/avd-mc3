@@ -31,6 +31,9 @@ evpn_vlan_aware_bundles: true
 underlay_multicast: true
 evpn_multicast: true
 
+load_interval:
+  default: 1
+  
 # Local users
 local_users:
   # Define a new user, which is called "ansible"

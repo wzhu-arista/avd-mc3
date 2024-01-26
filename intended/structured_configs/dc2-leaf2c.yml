@@ -74,7 +74,7 @@ ethernet_interfaces:
   spanning_tree_portfast: edge
 port_channel_interfaces:
 - name: Port-Channel1
-  description: DC2-LEAF2A_Po4
+  description: DC2_L3_LEAF2_Po4
   type: switched
   shutdown: false
   mode: trunk

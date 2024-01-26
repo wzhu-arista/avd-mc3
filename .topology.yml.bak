@@ -6,7 +6,7 @@ topology:
       # binds:
       #   - ma1mapping.json:/mnt/flash/EosIntfMapping.json:ro
       startup-config: ./ceos_lab_template/ceos.cfg.tpl
-      image: ceos:20240115
+      image: ceos:skumar
     linux:
       image: alpine-host
 
