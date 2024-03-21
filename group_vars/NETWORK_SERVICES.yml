@@ -14,7 +14,7 @@ tenants:
     evpn_l3_multicast:
       enabled: true
       evpn_underlay_l3_multicast_group_ipv4_pool: 225.1.2.0/24
-      evpn_underlay_l3_multicast_group_ipv4_pool_offset: 1   
+      mu_offset: 1   
       evpn_peg:
       - nodes: [dc1-bl1, dc1-bl2, dc1-leaf2a, dc1-leaf2b]
         transit: true
