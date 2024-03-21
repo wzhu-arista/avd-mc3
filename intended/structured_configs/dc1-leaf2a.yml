@@ -1,0 +1,291 @@
+hostname: dc1-leaf2a
+metadata:
+  platform: vEOS-lab
+is_deployed: true
+router_bgp:
+  as: '65102'
+  router_id: 10.255.1.4
+  bgp:
+    default:
+      ipv4_unicast: false
+  maximum_paths:
+    paths: 4
+    ecmp: 4
+  peer_groups:
+  - name: IPv4-UNDERLAY-PEERS
+    type: ipv4
+    password: 7x4B4rnJhZB438m9+BrBfQ==
+    maximum_routes: 12000
+    send_community: all
+  - name: EVPN-OVERLAY-PEERS
+    type: evpn
+    update_source: Loopback0
+    bfd: true
+    password: Q4fqtbqcZ7oQuKfuWtNGRQ==
+    send_community: all
+    maximum_routes: 0
+    ebgp_multihop: 3
+  address_family_ipv4:
+    peer_groups:
+    - name: IPv4-UNDERLAY-PEERS
+      activate: true
+    - name: EVPN-OVERLAY-PEERS
+      activate: false
+  redistribute_routes:
+  - source_protocol: connected
+    route_map: RM-CONN-2-BGP
+  neighbors:
+  - ip_address: 10.255.1.36
+    peer_group: IPv4-UNDERLAY-PEERS
+    remote_as: '65100'
+    peer: dc1-spine1
+    description: dc1-spine1_Ethernet2
+  - ip_address: 10.255.1.38
+    peer_group: IPv4-UNDERLAY-PEERS
+    remote_as: '65100'
+    peer: dc1-spine2
+    description: dc1-spine2_Ethernet2
+  - ip_address: 10.255.1.1
+    peer_group: EVPN-OVERLAY-PEERS
+    peer: dc1-spine1
+    description: dc1-spine1
+    remote_as: '65100'
+  - ip_address: 10.255.1.2
+    peer_group: EVPN-OVERLAY-PEERS
+    peer: dc1-spine2
+    description: dc1-spine2
+    remote_as: '65100'
+  address_family_evpn:
+    peer_groups:
+    - name: EVPN-OVERLAY-PEERS
+      activate: true
+  vrfs:
+  - name: VRF100
+    router_id: 10.255.1.4
+    rd: 10.255.1.4:100
+    route_targets:
+      import:
+      - address_family: evpn
+        route_targets:
+        - 100:100
+      export:
+      - address_family: evpn
+        route_targets:
+        - 100:100
+    redistribute_routes:
+    - source_protocol: connected
+    evpn_multicast: true
+  vlan_aware_bundles:
+  - name: VRF100
+    rd: 10.255.1.4:11100
+    route_targets:
+      both:
+      - 11100:11100
+    redistribute_routes:
+    - learned
+    vlan: 101-102
+static_routes:
+- vrf: MGMT
+  destination_address_prefix: 0.0.0.0/0
+  gateway: 192.168.124.1
+service_routing_protocols_model: multi-agent
+ip_routing: true
+router_multicast:
+  ipv4:
+    routing: true
+    software_forwarding: sfe
+  vrfs:
+  - name: VRF100
+    ipv4:
+      routing: true
+vlan_internal_order:
+  allocation: ascending
+  range:
+    beginning: 1006
+    ending: 1199
+spanning_tree:
+  mode: mstp
+  mst_instances:
+  - id: '0'
+    priority: 4096
+local_users:
+- name: admin
+  privilege: 15
+  role: network-admin
+  sha512_password: $6$7GTxsrRjnwheeKfR$zhJ8qycVjAJz41rf5JRSfWIzp93IL5WL7sMS/Taz1yfShz.MAnoajCf7R2n1/EZW7PN5QA3Huayl0lVQesBYN1
+- name: ansible
+  privilege: 15
+  role: network-admin
+  sha512_password: $6$7u4j1rkb3VELgcZE$EJt2Qff8kd/TapRoci0XaIZsL4tFzgq1YZBLD9c6f/knXzvcYY0NcMKndZeCv0T268knGKhOEwZAxqKjlMm920
+vrfs:
+- name: MGMT
+  ip_routing: false
+- name: VRF100
+  tenant: TENANT1
+  ip_routing: true
+management_interfaces:
+- name: Management0
+  description: oob_management
+  shutdown: false
+  vrf: MGMT
+  ip_address: 192.168.124.105/24
+  gateway: 192.168.124.1
+  type: oob
+management_api_http:
+  enable_vrfs:
+  - name: MGMT
+  enable_https: true
+lacp:
+  port_id:
+    range:
+      begin: 129
+      end: 256
+ethernet_interfaces:
+- name: Ethernet1
+  peer: dc1-spine1
+  peer_interface: Ethernet2
+  peer_type: spine
+  description: P2P_LINK_TO_DC1-SPINE1_Ethernet2
+  shutdown: false
+  mtu: 1500
+  type: routed
+  ip_address: 10.255.1.37/31
+  pim:
+    ipv4:
+      sparse_mode: true
+- name: Ethernet2
+  peer: dc1-spine2
+  peer_interface: Ethernet2
+  peer_type: spine
+  description: P2P_LINK_TO_DC1-SPINE2_Ethernet2
+  shutdown: false
+  mtu: 1500
+  type: routed
+  ip_address: 10.255.1.39/31
+  pim:
+    ipv4:
+      sparse_mode: true
+- name: Ethernet4
+  peer: dc1-leaf2c
+  peer_interface: Ethernet1
+  peer_type: l2leaf
+  description: DC1-LEAF2C_Ethernet1
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 4
+    mode: active
+- name: Ethernet5
+  peer: dc1-server2
+  peer_interface: eth1
+  peer_type: server
+  description: dc1-server2_eth1
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 5
+    mode: active
+port_channel_interfaces:
+- name: Port-Channel4
+  description: DC1-LEAF2C_Po1
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: 101-102
+- name: Port-Channel5
+  description: dc1-server2_PortChannel dc1-server2
+  type: switched
+  shutdown: false
+  mode: trunk
+  vlans: 101-102,111-112
+  native_vlan: 4092
+  spanning_tree_portfast: edge
+loopback_interfaces:
+- name: Loopback0
+  description: EVPN_Overlay_Peering
+  shutdown: false
+  ip_address: 10.255.1.4/32
+- name: Loopback1
+  description: VTEP_VXLAN_Tunnel_Source
+  shutdown: false
+  ip_address: 10.255.1.20/32
+- name: Loopback100
+  description: VRF100_VTEP_DIAGNOSTICS
+  shutdown: false
+  vrf: VRF100
+  ip_address: 10.255.100.4/32
+prefix_lists:
+- name: PL-LOOPBACKS-EVPN-OVERLAY
+  sequence_numbers:
+  - sequence: 10
+    action: permit 10.255.1.0/28 eq 32
+  - sequence: 20
+    action: permit 10.255.1.16/28 eq 32
+route_maps:
+- name: RM-CONN-2-BGP
+  sequence_numbers:
+  - sequence: 10
+    type: permit
+    match:
+    - ip address prefix-list PL-LOOPBACKS-EVPN-OVERLAY
+router_bfd:
+  multihop:
+    interval: 2000
+    min_rx: 2000
+    multiplier: 3
+  interval: 2000
+  min_rx: 2000
+  multiplier: 3
+vlans:
+- id: 101
+  name: VRF100_VLAN101
+  tenant: TENANT1
+- id: 102
+  name: VRF100_VLAN102
+  tenant: TENANT1
+ip_igmp_snooping:
+  globally_enabled: true
+ip_virtual_router_mac_address: 00:1c:73:00:00:99
+vlan_interfaces:
+- name: Vlan101
+  tenant: TENANT1
+  tags:
+  - VRF100_VLANS
+  description: VRF100_VLAN101
+  shutdown: false
+  ip_address_virtual: 10.10.101.1/24
+  ip_igmp: true
+  pim:
+    ipv4:
+      local_interface: Loopback100
+  vrf: VRF100
+- name: Vlan102
+  tenant: TENANT1
+  tags:
+  - VRF100_VLANS
+  description: VRF100_VLAN102
+  shutdown: false
+  ip_address_virtual: 10.10.102.1/24
+  ip_igmp: true
+  pim:
+    ipv4:
+      local_interface: Loopback100
+  vrf: VRF100
+vxlan_interface:
+  Vxlan1:
+    description: dc1-leaf2a_VTEP
+    vxlan:
+      udp_port: 4789
+      source_interface: Loopback1
+      vlans:
+      - id: 101
+        vni: 10101
+      - id: 102
+        vni: 10102
+      vrfs:
+      - name: VRF100
+        vni: 100
+        multicast_group: 225.1.2.100
+virtual_source_nat_vrfs:
+- name: VRF100
+  ip_address: 10.255.100.4
