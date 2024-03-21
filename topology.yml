@@ -8,7 +8,7 @@ topology:
       startup-config: ./ceos_lab_template/ceos.cfg.tpl
       image: ceos:skumar
     linux:
-      image: alpine-host
+      image: alpine-host:orig
 
   nodes:
     dc1-spine1:
