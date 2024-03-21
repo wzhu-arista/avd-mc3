@@ -201,7 +201,7 @@ vlan 102
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet3 |  dc1-server1_eth1 | trunk | 101-102,111-112 | 4092 | - | - |
+| Ethernet3 |  dc1-server1_eth1 | trunk | 101-102,111 | 4092 | - | - |
 
 *Inherited from Port-Channel Interface
 
@@ -236,7 +236,7 @@ interface Ethernet3
    description dc1-server1_eth1
    no shutdown
    switchport trunk native vlan 4092
-   switchport trunk allowed vlan 101-102,111-112
+   switchport trunk allowed vlan 101-102,111
    switchport mode trunk
    switchport
    spanning-tree portfast

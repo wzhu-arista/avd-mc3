@@ -168,7 +168,7 @@ ethernet_interfaces:
   shutdown: false
   type: switched
   mode: trunk
-  vlans: 101-102,111-112
+  vlans: 101-102,111
   native_vlan: 4092
   spanning_tree_portfast: edge
 loopback_interfaces:

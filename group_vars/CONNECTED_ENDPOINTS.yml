@@ -14,7 +14,7 @@ servers:
         # Device names where the server ports are connected.
         switches: [ dc1-leaf1 ]
         # VLANs that will be configured on these ports.
-        vlans: 101-102,111-112
+        vlans: 101-102,111
         # Native VLAN to be used on these ports.
         native_vlan: 4092
         # L2 mode of the port.
