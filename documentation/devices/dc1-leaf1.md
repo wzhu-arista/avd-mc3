@@ -179,6 +179,8 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 101 | VRF100_VLAN101 | - |
 | 102 | VRF100_VLAN102 | - |
+| 111 | VRF110_VLAN111 | - |
+| 112 | VRF110_VLAN112 | - |
 
 ### VLANs Device Configuration
 
@@ -189,6 +191,12 @@ vlan 101
 !
 vlan 102
    name VRF100_VLAN102
+!
+vlan 111
+   name VRF110_VLAN111
+!
+vlan 112
+   name VRF110_VLAN112
 ```
 
 ## Interfaces
@@ -253,6 +261,7 @@ interface Ethernet3
 | Loopback0 | EVPN_Overlay_Peering | default | 10.255.1.3/32 |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | 10.255.1.19/32 |
 | Loopback100 | VRF100_VTEP_DIAGNOSTICS | VRF100 | 10.255.100.3/32 |
+| Loopback110 | VRF110_VTEP_DIAGNOSTICS | VRF110 | 10.255.110.3/32 |
 
 ##### IPv6
 
@@ -261,6 +270,7 @@ interface Ethernet3
 | Loopback0 | EVPN_Overlay_Peering | default | - |
 | Loopback1 | VTEP_VXLAN_Tunnel_Source | default | - |
 | Loopback100 | VRF100_VTEP_DIAGNOSTICS | VRF100 | - |
+| Loopback110 | VRF110_VTEP_DIAGNOSTICS | VRF110 | - |
 
 #### Loopback Interfaces Device Configuration
 
@@ -281,6 +291,12 @@ interface Loopback100
    no shutdown
    vrf VRF100
    ip address 10.255.100.3/32
+!
+interface Loopback110
+   description VRF110_VTEP_DIAGNOSTICS
+   no shutdown
+   vrf VRF110
+   ip address 10.255.110.3/32
 ```
 
 ### VLAN Interfaces
@@ -291,6 +307,8 @@ interface Loopback100
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan101 | VRF100_VLAN101 | VRF100 | - | False |
 | Vlan102 | VRF100_VLAN102 | VRF100 | - | False |
+| Vlan111 | VRF110_VLAN111 | VRF110 | - | False |
+| Vlan112 | VRF110_VLAN112 | VRF110 | - | False |
 
 ##### IPv4
 
@@ -298,6 +316,8 @@ interface Loopback100
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
 | Vlan101 |  VRF100  |  -  |  10.10.101.1/24  |  -  |  -  |  -  |  -  |
 | Vlan102 |  VRF100  |  -  |  10.10.102.1/24  |  -  |  -  |  -  |  -  |
+| Vlan111 |  VRF110  |  -  |  10.10.111.1/24  |  -  |  -  |  -  |  -  |
+| Vlan112 |  VRF110  |  -  |  10.10.112.1/24  |  -  |  -  |  -  |  -  |
 
 #### VLAN Interfaces Device Configuration
 
@@ -318,6 +338,22 @@ interface Vlan102
    ip igmp
    pim ipv4 local-interface Loopback100
    ip address virtual 10.10.102.1/24
+!
+interface Vlan111
+   description VRF110_VLAN111
+   no shutdown
+   vrf VRF110
+   ip igmp
+   pim ipv4 local-interface Loopback110
+   ip address virtual 10.10.111.1/24
+!
+interface Vlan112
+   description VRF110_VLAN112
+   no shutdown
+   vrf VRF110
+   ip igmp
+   pim ipv4 local-interface Loopback110
+   ip address virtual 10.10.112.1/24
 ```
 
 ### VXLAN Interface
@@ -335,12 +371,15 @@ interface Vlan102
 | ---- | --- | ---------- | --------------- |
 | 101 | 10101 | - | - |
 | 102 | 10102 | - | - |
+| 111 | 10111 | - | - |
+| 112 | 10112 | - | - |
 
 ##### VRF to VNI and Multicast Group Mappings
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
 | VRF100 | 100 | 225.1.2.99 |
+| VRF110 | 110 | 225.1.2.109 |
 
 #### VXLAN Interface Device Configuration
 
@@ -352,8 +391,12 @@ interface Vxlan1
    vxlan udp-port 4789
    vxlan vlan 101 vni 10101
    vxlan vlan 102 vni 10102
+   vxlan vlan 111 vni 10111
+   vxlan vlan 112 vni 10112
    vxlan vrf VRF100 vni 100
+   vxlan vrf VRF110 vni 110
    vxlan vrf VRF100 multicast group 225.1.2.99
+   vxlan vrf VRF110 multicast group 225.1.2.109
 ```
 
 ## Routing
@@ -389,6 +432,7 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 | default | True |
 | MGMT | False |
 | VRF100 | True |
+| VRF110 | True |
 
 #### IP Routing Device Configuration
 
@@ -397,6 +441,7 @@ ip virtual-router mac-address 00:1c:73:00:00:99
 ip routing
 no ip routing vrf MGMT
 ip routing vrf VRF100
+ip routing vrf VRF110
 ```
 
 ### IPv6 Routing
@@ -408,6 +453,7 @@ ip routing vrf VRF100
 | default | False |
 | MGMT | false |
 | VRF100 | false |
+| VRF110 | false |
 
 ### Static Routes
 
@@ -480,12 +526,14 @@ ip route vrf MGMT 0.0.0.0/0 192.168.124.1
 | VLAN Aware Bundle | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute | VLANs |
 | ----------------- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ | ----- |
 | VRF100 | 10.255.1.3:11100 | 11100:11100 | - | - | learned | 101-102 |
+| VRF110 | 10.255.1.3:11110 | 11110:11110 | - | - | learned | 111-112 |
 
 #### Router BGP VRFs
 
 | VRF | Route-Distinguisher | Redistribute | EVPN Multicast |
 | --- | ------------------- | ------------ | -------------- |
 | VRF100 | 10.255.1.3:100 | connected | IPv4: True<br>Transit: False |
+| VRF110 | 10.255.1.3:110 | connected | IPv4: True<br>Transit: False |
 
 #### Router BGP Device Configuration
 
@@ -526,6 +574,12 @@ router bgp 65101
       redistribute learned
       vlan 101-102
    !
+   vlan-aware-bundle VRF110
+      rd 10.255.1.3:11110
+      route-target both 11110:11110
+      redistribute learned
+      vlan 111-112
+   !
    address-family evpn
       neighbor EVPN-OVERLAY-PEERS activate
    !
@@ -538,6 +592,14 @@ router bgp 65101
       evpn multicast
       route-target import evpn 100:100
       route-target export evpn 100:100
+      router-id 10.255.1.3
+      redistribute connected
+   !
+   vrf VRF110
+      rd 10.255.1.3:110
+      evpn multicast
+      route-target import evpn 110:110
+      route-target export evpn 110:110
       router-id 10.255.1.3
       redistribute connected
 ```
@@ -594,6 +656,7 @@ router bfd
 | VRF Name | Multicast Routing |
 | -------- | ----------------- |
 | VRF100 | enabled |
+| VRF110 | enabled |
 
 #### Router Multicast Device Configuration
 
@@ -605,6 +668,10 @@ router multicast
       software-forwarding sfe
    !
    vrf VRF100
+      ipv4
+         routing
+   !
+   vrf VRF110
       ipv4
          routing
 ```
@@ -666,6 +733,7 @@ route-map RM-CONN-2-BGP permit 10
 | -------- | ---------- |
 | MGMT | disabled |
 | VRF100 | enabled |
+| VRF110 | enabled |
 
 ### VRF Instances Device Configuration
 
@@ -674,6 +742,8 @@ route-map RM-CONN-2-BGP permit 10
 vrf instance MGMT
 !
 vrf instance VRF100
+!
+vrf instance VRF110
 ```
 
 ## Virtual Source NAT
@@ -683,10 +753,12 @@ vrf instance VRF100
 | Source NAT VRF | Source NAT IP Address |
 | -------------- | --------------------- |
 | VRF100 | 10.255.100.3 |
+| VRF110 | 10.255.110.3 |
 
 ### Virtual Source NAT Configuration
 
 ```eos
 !
 ip address virtual source-nat vrf VRF100 address 10.255.100.3
+ip address virtual source-nat vrf VRF110 address 10.255.110.3
 ```

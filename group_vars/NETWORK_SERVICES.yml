@@ -110,22 +110,22 @@ tenants:
             nodes: 
               - dc1-leaf2b
             send_community: standard 
-      # - name: VRF110
-      #   vrf_vni: 110
-      #   vtep_diagnostic:
-      #     loopback: 110
-      #     loopback_ip_range: 10.255.110.0/27
-      #   svis:
-      #     - id: 111
-      #       tags: [ VRF110_VLANS ]
-      #       name: VRF110_VLAN111
-      #       enabled: true
-      #       ip_address_virtual: 10.10.111.1/24
-      #     - id: 112
-      #       tags: [ VRF110_VLANS ]
-      #       name: VRF110_VLAN112
-      #       enabled: true
-      #       ip_address_virtual: 10.10.112.1/24
+      - name: VRF110
+        vrf_vni: 110
+        vtep_diagnostic:
+          loopback: 110
+          loopback_ip_range: 10.255.110.0/27
+        svis:
+          - id: 111
+            tags: [ VRF110_VLANS ]
+            name: VRF110_VLAN111
+            enabled: true
+            ip_address_virtual: 10.10.111.1/24
+          - id: 112
+            tags: [ VRF110_VLANS ]
+            name: VRF110_VLAN112
+            enabled: true
+            ip_address_virtual: 10.10.112.1/24
 
   # Definition of tenants. Additional level of abstraction to VRFs
   - name: TENANT2

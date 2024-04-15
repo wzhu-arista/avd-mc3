@@ -167,6 +167,8 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 101 | VRF100_VLAN101 | - |
 | 102 | VRF100_VLAN102 | - |
+| 111 | VRF110_VLAN111 | - |
+| 112 | VRF110_VLAN112 | - |
 
 ### VLANs Device Configuration
 
@@ -177,6 +179,12 @@ vlan 101
 !
 vlan 102
    name VRF100_VLAN102
+!
+vlan 111
+   name VRF110_VLAN111
+!
+vlan 112
+   name VRF110_VLAN112
 ```
 
 ## Interfaces
@@ -189,8 +197,8 @@ vlan 102
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet1 | DC1-LEAF2A_Ethernet4 | *trunk | *101-102 | *- | *- | 1 |
-| Ethernet2 | DC1-LEAF2B_Ethernet4 | *trunk | *101-102 | *- | *- | 1 |
+| Ethernet1 | DC1-LEAF2A_Ethernet4 | *trunk | *101-102,111-112 | *- | *- | 1 |
+| Ethernet2 | DC1-LEAF2B_Ethernet4 | *trunk | *101-102,111-112 | *- | *- | 1 |
 | Ethernet3 |  dc1-server2_eth3 | access | 11 | - | - | - |
 
 *Inherited from Port-Channel Interface
@@ -226,7 +234,7 @@ interface Ethernet3
 
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel1 | DC1-LEAF2A_Po4 | switched | trunk | 101-102 | - | - | - | - | - | - |
+| Port-Channel1 | DC1-LEAF2A_Po4 | switched | trunk | 101-102,111-112 | - | - | - | - | - | - |
 
 #### Port-Channel Interfaces Device Configuration
 
@@ -236,7 +244,7 @@ interface Port-Channel1
    description DC1-LEAF2A_Po4
    no shutdown
    switchport
-   switchport trunk allowed vlan 101-102
+   switchport trunk allowed vlan 101-102,111-112
    switchport mode trunk
 ```
 

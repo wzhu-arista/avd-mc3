@@ -78,13 +78,19 @@ port_channel_interfaces:
   type: switched
   shutdown: false
   mode: trunk
-  vlans: 101-102
+  vlans: 101-102,111-112
 vlans:
 - id: 101
   name: VRF100_VLAN101
   tenant: TENANT1
 - id: 102
   name: VRF100_VLAN102
+  tenant: TENANT1
+- id: 111
+  name: VRF110_VLAN111
+  tenant: TENANT1
+- id: 112
+  name: VRF110_VLAN112
   tenant: TENANT1
 ip_igmp_snooping:
   globally_enabled: true
