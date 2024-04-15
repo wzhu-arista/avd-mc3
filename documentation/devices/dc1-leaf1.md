@@ -201,7 +201,7 @@ vlan 102
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet3 |  dc1-server1_eth1 | trunk | 101-102,111 | 4092 | - | - |
+| Ethernet3 |  dc1-server1_eth1 | trunk | 101-102,111-112 | 4092 | - | - |
 
 *Inherited from Port-Channel Interface
 
@@ -236,7 +236,7 @@ interface Ethernet3
    description dc1-server1_eth1
    no shutdown
    switchport trunk native vlan 4092
-   switchport trunk allowed vlan 101-102,111
+   switchport trunk allowed vlan 101-102,111-112
    switchport mode trunk
    switchport
    spanning-tree portfast
@@ -340,7 +340,7 @@ interface Vlan102
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| VRF100 | 100 | 225.1.2.100 |
+| VRF100 | 100 | 225.1.2.99 |
 
 #### VXLAN Interface Device Configuration
 
@@ -353,7 +353,7 @@ interface Vxlan1
    vxlan vlan 101 vni 10101
    vxlan vlan 102 vni 10102
    vxlan vrf VRF100 vni 100
-   vxlan vrf VRF100 multicast group 225.1.2.100
+   vxlan vrf VRF100 multicast group 225.1.2.99
 ```
 
 ## Routing

@@ -285,7 +285,7 @@ vxlan_interface:
       vrfs:
       - name: VRF100
         vni: 100
-        multicast_group: 225.1.2.100
+        multicast_group: 225.1.2.99
 virtual_source_nat_vrfs:
 - name: VRF100
   ip_address: 10.255.100.4

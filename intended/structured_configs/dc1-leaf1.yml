@@ -168,7 +168,7 @@ ethernet_interfaces:
   shutdown: false
   type: switched
   mode: trunk
-  vlans: 101-102,111
+  vlans: 101-102,111-112
   native_vlan: 4092
   spanning_tree_portfast: edge
 loopback_interfaces:
@@ -256,7 +256,7 @@ vxlan_interface:
       vrfs:
       - name: VRF100
         vni: 100
-        multicast_group: 225.1.2.100
+        multicast_group: 225.1.2.99
 virtual_source_nat_vrfs:
 - name: VRF100
   ip_address: 10.255.100.3

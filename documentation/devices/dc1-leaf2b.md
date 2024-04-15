@@ -413,7 +413,7 @@ interface Vlan102
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| VRF100 | 100 | 225.1.2.100 |
+| VRF100 | 100 | 225.1.2.99 |
 
 #### VXLAN Interface Device Configuration
 
@@ -426,7 +426,7 @@ interface Vxlan1
    vxlan vlan 101 vni 10101
    vxlan vlan 102 vni 10102
    vxlan vrf VRF100 vni 100
-   vxlan vrf VRF100 multicast group 225.1.2.100
+   vxlan vrf VRF100 multicast group 225.1.2.99
 ```
 
 ## Routing
